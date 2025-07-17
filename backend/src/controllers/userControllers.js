@@ -2,7 +2,7 @@ import bcrypt from 'bcrypt';
 import dotenv from 'dotenv';
 import User from '../models/userModel.js';
 import { sendOtp, verifyOtp } from '../lib/sendOtp.js';
-import { sendMail } from './sendMail.js';
+import { sendMail } from '../lib/sendMail.js';
 
 dotenv.config();
 
@@ -31,7 +31,7 @@ export const registerUser = async (req, res) => {
     if (!otp) {
       const htmlContent = `
         <div style="font-family: Arial, sans-serif; line-height: 1.5; max-width: 600px; margin: auto; border: 1px solid #e0e0e0; padding: 20px; border-radius: 10px; background-color: #fafafa;">
-          <h2>🔐 Your One-Time Password (OTP)</h2>
+          <h2>🔐 Your One-Time Password ${otp}</h2>
           <p>Hello ${userName},</p>
           <p>Use the OTP below to complete your registration:</p>
           <p style="font-size: 24px; font-weight: bold; color: #e74c3c;">[ OTP will be emailed ]</p>
