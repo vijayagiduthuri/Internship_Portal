@@ -1,8 +1,8 @@
-import bcrypt from 'bcrypt';
-import dotenv from 'dotenv';
-import User from '../models/userModel.js';
-import { sendOtp, verifyOtp } from '../lib/sendOtp.js';
-import { sendMail } from '../lib/sendMail.js';
+import bcrypt from "bcrypt";
+import dotenv from "dotenv";
+import User from "../models/userModel.js";
+import { sendOtp, verifyOtp } from "../lib/sendOtp.js";
+import { sendMail } from "../lib/sendMail.js";
 
 dotenv.config();
 
@@ -12,18 +12,18 @@ export const registerUser = async (req, res) => {
   if (!email || !userName || !password) {
     return res.status(400).json({
       success: false,
-      message: 'Email, username, and password are required.',
+      message: "Email, username, and password are required.",
     });
   }
 
   const lowerEmail = email.toLowerCase();
 
   try {
-    const existingUser = await User.findOne({ userEmail: lowerEmail });
+    const existingUser = await User.findOne({ email: lowerEmail });
     if (existingUser) {
       return res.status(409).json({
         success: false,
-        message: 'User already exists.',
+        message: "User already exists.",
       });
     }
 
@@ -52,7 +52,7 @@ export const registerUser = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, salt);
     const newUser = new User({
       userName,
-      userEmail: lowerEmail,
+      email: lowerEmail,
       password: hashedPassword,
     });
 
@@ -65,18 +65,17 @@ export const registerUser = async (req, res) => {
         <p>You can now log in and start using our services.</p>
       </div>
     `;
-    await sendMail(lowerEmail, welcomeHtml, 'Welcome to Our Platform!');
+    await sendMail(lowerEmail, welcomeHtml, "Welcome to Our Platform!");
 
     return res.status(201).json({
       success: true,
-      message: 'Registration successful. Welcome email sent.',
+      message: "Registration successful. Welcome email sent.",
     });
-
   } catch (err) {
-    console.error('Registration Error:', err);
+    console.error("Registration Error:", err);
     return res.status(500).json({
       success: false,
-      message: 'Server error',
+      message: "Server error",
       error: err.message,
     });
   }

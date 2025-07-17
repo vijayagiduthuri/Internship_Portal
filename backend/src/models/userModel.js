@@ -7,7 +7,7 @@ const userSchema = mongoose.Schema(
       required: true,
       unique: true,
     },
-    userEmail: {
+    email: {
       type: String,
       required: true,
       unique: true,
@@ -18,10 +18,6 @@ const userSchema = mongoose.Schema(
       type: String,
       required: true,
       minLength: 6,
-    },
-    isVerified: {
-      type: Boolean,
-      default: false,
     },
   },
   { timestamps: true }
