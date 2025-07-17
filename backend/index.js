@@ -1,0 +1,37 @@
+import express from "express";
+import cors from "cors";
+import cookieParser from "cookie-parser";
+import dotenv from "dotenv";
+
+// Load environment variables
+dotenv.config();
+
+// Initialize express app
+const app = express();
+
+// Parse JSON bodies
+app.use(express.json());
+
+// Parse cookies
+app.use(cookieParser());
+
+// CORS configuration
+app.use(
+  cors({
+    origin: "http://localhost:5173", // Replace with your frontend URL
+    credentials: true, // Allow credentials (cookies, authorization headers, etc.)
+  })
+);
+
+// Sample test route
+app.get("/", (req, res) => {
+  res.send("API is running...");
+});
+
+// Set the port from environment variable or default to 9000
+const PORT = process.env.PORT || 9000;
+
+//running the server
+app.listen(PORT, () => {
+  console.log("Server is running on PORT : " + PORT);
+});
