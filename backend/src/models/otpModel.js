@@ -1,26 +1,26 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 // Otp schema definition
 const otpSchema = new mongoose.Schema(
   {
-    userEmail: {
+    email: {
       type: String,
       required: true,
       unique: true, // Only allow one OTP per email at a time
-      lowercase: true
+      lowercase: true,
     },
     otp: {
       type: String,
-      required: true
+      required: true,
     },
     otpExpiry: {
       type: Date,
-      required: true
-    }
+      required: true,
+    },
   },
   { timestamps: true }
 );
 
 // Create OTP model
-const Otp = mongoose.model('Otp', otpSchema);
+const Otp = mongoose.model("Otp", otpSchema);
 export default Otp;

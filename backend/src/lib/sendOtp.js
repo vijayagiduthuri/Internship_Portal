@@ -13,7 +13,7 @@ export const sendOtp = async (req, res, htmlContent) => {
         .replace(/{{OTP}}/g, otpCode);
     try {
         await Otp.findOneAndUpdate(
-            { userEmail: email.toLowerCase() },
+            { email: email.toLowerCase() },
             { otp: otpCode, otpExpiry: expiry },
             { upsert: true, new: true }
         );
@@ -35,7 +35,7 @@ export const verifyOtp = async (email, otp) => {
     }
 
     try {
-        const record = await Otp.findOne({ userEmail: email.toLowerCase() });
+        const record = await Otp.findOne({ email: email.toLowerCase() });
 
         if (!record) {
             return {
@@ -61,7 +61,7 @@ export const verifyOtp = async (email, otp) => {
             };
         }
 
-        await Otp.deleteOne({ userEmail: email.toLowerCase() });
+        await Otp.deleteOne({ email: email.toLowerCase() });
 
         return {
             success: true,
