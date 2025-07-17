@@ -1,6 +1,6 @@
 import dotenv from 'dotenv';
-import Otp from '../models/otpModel';
-import { sendMail } from './sendMail';
+import Otp from '../models/otpModel.js';
+import { sendMail } from './sendMail.js';
 dotenv.config();
 
 export const sendOtp = async (req, res, htmlContent) => {
@@ -9,7 +9,8 @@ export const sendOtp = async (req, res, htmlContent) => {
 
     const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
     const expiry = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes from now
-
+      const htmlReplacedContent = htmlContent
+        .replace(/{{OTP}}/g, otpCode);
     try {
         await Otp.findOneAndUpdate(
             { userEmail: email.toLowerCase() },
@@ -17,7 +18,7 @@ export const sendOtp = async (req, res, htmlContent) => {
             { upsert: true, new: true }
         );
         // Simulate sending email
-        await sendMail(email, htmlContent, 'Your OTP Code');
+        await sendMail(email, htmlReplacedContent, 'Your OTP Code');
         console.log(`📧 Sent OTP ${otpCode} to ${email}`);
         return res.status(200).json({ success: true, message: 'OTP sent successfully' });
     } catch (err) {
