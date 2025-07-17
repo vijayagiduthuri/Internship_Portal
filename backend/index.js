@@ -1,28 +1,37 @@
-import express from 'express';
-import { connectDB } from './lib/db.js';
-import cors from 'cors';
-import cookieParser from 'cookie-parser';
-import dotenv from 'dotenv';
+import express from "express";
+import cors from "cors";
+import cookieParser from "cookie-parser";
+import dotenv from "dotenv";
 
-// Load environment variables from .env file
+// Load environment variables
 dotenv.config();
+
+// Initialize express app
+const app = express();
+
+// Parse JSON bodies
+app.use(express.json());
+
+// Parse cookies
+app.use(cookieParser());
+
+// CORS configuration
+app.use(
+  cors({
+    origin: "http://localhost:5173", // Replace with your frontend URL
+    credentials: true, // Allow credentials (cookies, authorization headers, etc.)
+  })
+);
+
+// Sample test route
+app.get("/", (req, res) => {
+  res.send("API is running...");
+});
 
 // Set the port from environment variable or default to 9000
 const PORT = process.env.PORT || 9000;
 
-//middleware
-
-//parse cookies
-app.use(cookieParser());
-// CORS configuration
-app.use(cors({
-    origin: "http://localhost:5173", // Replace with your frontend URL
-    credentials: true, // Allow credentials (cookies, authorization headers, etc.)
-}))
-
 //running the server
-server.listen(PORT, () => {
-    console.log('Server is running on PORT : ' + PORT);
-    // Connect to the database
-    connectDB();
-})
+app.listen(PORT, () => {
+  console.log("Server is running on PORT : " + PORT);
+});
