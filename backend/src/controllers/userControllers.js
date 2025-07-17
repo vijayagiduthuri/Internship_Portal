@@ -34,7 +34,7 @@ export const registerUser = async (req, res) => {
           <h2>🔐 Your One-Time Password ${otp}</h2>
           <p>Hello ${userName},</p>
           <p>Use the OTP below to complete your registration:</p>
-          <p style="font-size: 24px; font-weight: bold; color: #e74c3c;">[ OTP will be emailed ]</p>
+          <p style="font-size: 24px; font-weight: bold; color: #e74c3c;">{{OTP}}</p>
           <p>This OTP is valid for <strong>5 minutes</strong>.</p>
         </div>
       `;

@@ -9,10 +9,9 @@ export const sendOtp = async (req, res, htmlContent) => {
     return res
       .status(400)
       .json({ success: false, message: "Email is required" });
-
   const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
   const expiry = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes from now
-
+  const htmlReplacedContent = htmlContent.replace(/{{OTP}}/g, otpCode);
   try {
     await Otp.findOneAndUpdate(
       { userEmail: email.toLowerCase() },
@@ -20,9 +19,7 @@ export const sendOtp = async (req, res, htmlContent) => {
       { upsert: true, new: true }
     );
     // Simulate sending email
-    const result = await sendMail(email, htmlContent, "Your OTP Code");
-    console.log(result); // This will show error if email sending failed
-
+    await sendMail(email, htmlReplacedContent, "Your OTP Code");
     console.log(`📧 Sent OTP ${otpCode} to ${email}`);
     return res
       .status(200)
@@ -37,6 +34,7 @@ export const sendOtp = async (req, res, htmlContent) => {
       });
   }
 };
+
 export const verifyOtp = async (email, otp) => {
   if (!email || !otp) {
     return {
