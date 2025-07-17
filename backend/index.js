@@ -2,6 +2,8 @@ import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
+import userRoutes from "./src/routes/userRoutes.js";
+import { connectDB } from "./src/lib/db.js";
 
 // Load environment variables
 dotenv.config();
@@ -15,6 +17,9 @@ app.use(express.json());
 // Parse cookies
 app.use(cookieParser());
 
+// Import user routes
+app.use("/api/auth", userRoutes);
+
 // CORS configuration
 app.use(
   cors({
@@ -23,15 +28,11 @@ app.use(
   })
 );
 
-// Sample test route
-app.get("/", (req, res) => {
-  res.send("API is running...");
-});
-
 // Set the port from environment variable or default to 9000
 const PORT = process.env.PORT || 9000;
 
 //running the server
 app.listen(PORT, () => {
   console.log("Server is running on PORT : " + PORT);
+  connectDB();
 });
