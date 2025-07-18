@@ -57,10 +57,17 @@ export const registerUser = async (req, res) => {
 
       const user = await User.findOne({ userName });
       if (user) {
-      return res.status(401).json({ status: "false", message: "userName already exsists"});
+        return res
+          .status(401)
+          .json({ status: "false", message: "userName already exsists" });
       }
       if (password.length < 6) {
-      return res.status(401).json({ status: "false", message: "password must be at least 6 characters long"});
+        return res
+          .status(401)
+          .json({
+            status: "false",
+            message: "password must be at least 6 characters long",
+          });
       }
       await newUser.save();
 
@@ -77,9 +84,7 @@ export const registerUser = async (req, res) => {
         success: true,
         message: "Registration successful. Welcome email sent.",
       });
-    }
-    else
-    {
+    } else {
       return res.status(400).json({
         success: false,
         message: "Required fields not provided",
@@ -210,15 +215,19 @@ export const forgotPassword = async (req, res) => {
   const { email, otp, resetToken, newPassword } = req.body;
   const lowerEmail = email.toLowerCase();
   if (!email) {
-    return res.status(400).json({ success: false, message: "Email is required" });
+    return res
+      .status(400)
+      .json({ success: false, message: "Email is required" });
   }
   try {
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(404).json({ success: false, message: "User not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
     }
     // First Hit - email only
-    if (!otp) {
+    if (!otp && !newPassword) {
       const htmlContent = `
         <div style="font-family: Arial, sans-serif; line-height: 1.5; max-width: 600px; margin: auto; border: 1px solid #e0e0e0; padding: 20px; border-radius: 10px; background-color: #fafafa;">
           <h2>🔐 Forgot Password OTP</h2>
@@ -232,7 +241,7 @@ export const forgotPassword = async (req, res) => {
     }
     // Second Hit - Email and otp
     if (otp && !newPassword && !resetToken) {
-      const otpResult = await verifyOtp(lowerEmail, otp);  // e.g. { success, status, message }
+      const otpResult = await verifyOtp(lowerEmail, otp); // e.g. { success, status, message }
       if (!otpResult.success) {
         return res.status(otpResult.status).json(otpResult);
       }
@@ -242,9 +251,9 @@ export const forgotPassword = async (req, res) => {
       return res.status(200).json({
         success: true,
         status: 200,
-        message: 'OTP verified. Use the reset token to set a new password.',
+        message: "OTP verified. Use the reset token to set a new password.",
         resetToken: token,
-        expiresIn: 300,         // seconds (5 min) – convenient for the client
+        expiresIn: 300, // seconds (5 min) – convenient for the client
       });
     }
     // Third Hit - email, otp, resetToken, newPassword
@@ -259,7 +268,7 @@ export const forgotPassword = async (req, res) => {
         return res.status(400).json({
           success: false,
           status: 400,
-          message: 'Password must be at least 6 characters.',
+          message: "Password must be at least 6 characters.",
         });
       }
 
@@ -274,27 +283,21 @@ export const forgotPassword = async (req, res) => {
       return res.status(200).json({
         success: true,
         status: 200,
-        message: 'Password updated successfully.',
+        message: "Password updated successfully.",
       });
-
-
-    }
-    
-    else {
+    } else {
       return res.status(400).json({
-          success: false,
-          status: 400,
-          message: 'Required fields not provided',
-        });
+        success: false,
+        status: 400,
+        message: "Required fields not provided",
+      });
     }
   } catch (err) {
-    console.error('Forgot‑Password Error:', err);
+    console.error("Forgot‑Password Error:", err);
     return res.status(500).json({
       success: false,
       status: 500,
-      message: 'Server error.',
+      message: "Server error.",
     });
   }
 };
-
-
