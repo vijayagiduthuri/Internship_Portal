@@ -189,3 +189,78 @@ export const updatePassword = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
+//Function to forgot password
+export const forgotPassword = async (req, res) => {
+  const email = String(req.body.email || "").trim().toLowerCase();
+  const otp = req.body.otp;
+  const newPassword = req.body.newPassword;
+
+  if (!email) {
+    return res.status(400).json({ success: false, message: "Email is required" });
+  }
+
+  try {
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    // STEP 1: Send OTP
+    if (!otp && !newPassword) {
+      const htmlContent = `
+        <div style="font-family: Arial, sans-serif; line-height: 1.5; max-width: 600px; margin: auto; border: 1px solid #e0e0e0; padding: 20px; border-radius: 10px; background-color: #fafafa;">
+          <h2>🔐 Forgot Password OTP</h2>
+          <p>Hello ${user.userName},</p>
+          <p>Use the OTP below to reset your password:</p>
+          <p style="font-size: 24px; font-weight: bold; color: #3498db;">{{OTP}}</p>
+          <p>This OTP is valid for <strong>5 minutes</strong>.</p>
+        </div>
+      `;
+      return await sendOtp(req, res, htmlContent);
+    }
+
+    // STEP 2: OTP + New Password → First verify OTP
+    if (otp && newPassword) {
+      // ✅ 1. Verify OTP first
+      const otpResult = await verifyOtp(email, otp);
+      if (!otpResult.success) {
+        return res.status(otpResult.status).json(otpResult);
+      }
+
+      // ✅ 2. THEN check password
+      if (newPassword.length < 6 || newPassword.length > 100 || newPassword.includes(" ")) {
+        return res.status(400).json({
+          success: false,
+          message: "Password must be 6–100 characters and cannot contain spaces",
+        });
+      }
+
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(newPassword, salt);
+      user.password = hashedPassword;
+      user.updatedAt = new Date();
+      await user.save();
+
+      return res.status(200).json({
+        success: true,
+        message: "Password reset successfully",
+      });
+    }
+
+    return res.status(400).json({
+      success: false,
+      message: "Invalid request. Provide both OTP and newPassword to reset.",
+    });
+
+  } catch (err) {
+    console.error("Forgot Password Error:", err.message);
+    return res.status(500).json({
+      success: false,
+      message: "Server error",
+      error: err.message,
+    });
+  }
+};
+
+

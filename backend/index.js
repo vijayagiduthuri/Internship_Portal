@@ -13,6 +13,7 @@ const app = express();
 
 // Parse JSON bodies
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // Parse cookies
 app.use(cookieParser());
