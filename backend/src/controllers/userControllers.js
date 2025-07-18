@@ -38,7 +38,6 @@ export const registerUser = async (req, res) => {
     // STEP 2: OTP provided → verify OTP (new logic)
     if (!verifyToken && email && otp) {
       const otpResult = await verifyOtp(lowerEmail, otp);
-      console.log(otpResult.success)
       return res.status(otpResult.status).json(otpResult);
     }
 
@@ -60,7 +59,9 @@ export const registerUser = async (req, res) => {
       if (user) {
       return res.status(401).json({ status: "false", message: "userName already exsists"});
       }
-      
+      if (password.length < 6) {
+      return res.status(401).json({ status: "false", message: "password must be at least 6 characters long"});
+      }
       await newUser.save();
 
       const welcomeHtml = `
@@ -75,6 +76,13 @@ export const registerUser = async (req, res) => {
       return res.status(201).json({
         success: true,
         message: "Registration successful. Welcome email sent.",
+      });
+    }
+    else
+    {
+      return res.status(400).json({
+        success: false,
+        message: "Required fields not provided",
       });
     }
   } catch (err) {
