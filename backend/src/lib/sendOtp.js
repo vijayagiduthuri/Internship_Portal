@@ -1,6 +1,7 @@
 import dotenv from 'dotenv';
 import Otp from '../models/otpModel.js';
 import { sendMail } from './sendMail.js';
+import { generateOtpToken } from './otpToken.js';
 dotenv.config();
 
 export const sendOtp = async (req, res, htmlContent) => {
@@ -60,12 +61,13 @@ export const verifyOtp = async (email, otp) => {
                 message: 'OTP expired',
             };
         }
-
+        const token = await generateOtpToken(email.toLowerCase());
         await Otp.deleteOne({ email: email.toLowerCase() });
-
         return {
             success: true,
+            status: 200,
             message: 'OTP verified successfully',
+            verifyToken: token
         };
     } catch (err) {
         return {
