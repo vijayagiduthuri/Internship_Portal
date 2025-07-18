@@ -3,18 +3,12 @@ import dotenv from "dotenv";
 import User from "../models/userModel.js";
 import { sendOtp, verifyOtp } from "../lib/sendOtp.js";
 import { sendMail } from "../lib/sendMail.js";
+import { generateOtpToken, verifyOtpToken } from "../lib/otpToken.js";
 
 dotenv.config();
 
 export const registerUser = async (req, res) => {
-  const { email, userName, password, otp } = req.body;
-
-  if (!email || !userName || !password) {
-    return res.status(400).json({
-      success: false,
-      message: "Email, username, and password are required.",
-    });
-  }
+  const { email, userName, password, otp, verifyToken } = req.body;
 
   const lowerEmail = email.toLowerCase();
 
@@ -28,7 +22,7 @@ export const registerUser = async (req, res) => {
     }
 
     // STEP 1: No OTP provided → Send OTP
-    if (!otp) {
+    if (!verifyToken && !otp) {
       const htmlContent = `
         <div style="font-family: Arial, sans-serif; line-height: 1.5; max-width: 600px; margin: auto; border: 1px solid #e0e0e0; padding: 20px; border-radius: 10px; background-color: #fafafa;">
           <h2>🔐 Your One-Time Password (OTP)</h2>
@@ -42,35 +36,47 @@ export const registerUser = async (req, res) => {
     }
 
     // STEP 2: OTP provided → verify OTP (new logic)
-    const otpResult = await verifyOtp(lowerEmail, otp);
-    if (!otpResult.success) {
+    if (!verifyToken && email && otp) {
+      const otpResult = await verifyOtp(lowerEmail, otp);
+      console.log(otpResult.success)
       return res.status(otpResult.status).json(otpResult);
     }
 
-    // STEP 3: Hash password and create user
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
-    const newUser = new User({
-      userName,
-      email: lowerEmail,
-      password: hashedPassword,
-    });
+    if (userName && verifyToken) {
+      const tokenResult = await verifyOtpToken(lowerEmail, verifyToken);
+      if (!tokenResult.success) {
+        return res.status(tokenResult.status).json(tokenResult);
+      }
+      // STEP 3: Hash password and create user
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(password, salt);
+      const newUser = new User({
+        userName,
+        email: lowerEmail,
+        password: hashedPassword,
+      });
 
-    await newUser.save();
+      const user = await User.findOne({ userName });
+      if (user) {
+      return res.status(401).json({ status: "false", message: "userName already exsists"});
+      }
+      
+      await newUser.save();
 
-    const welcomeHtml = `
+      const welcomeHtml = `
       <div style="font-family: Arial, sans-serif; padding: 20px; background-color: #f6f6f6;">
         <h2 style="color: #2c3e50;">🎉 Welcome, ${userName}!</h2>
         <p>We're excited to have you on board.</p>
         <p>You can now log in and start using our services.</p>
       </div>
     `;
-    await sendMail(lowerEmail, welcomeHtml, "Welcome to Our Platform!");
+      await sendMail(lowerEmail, welcomeHtml, "Welcome to Our Platform!");
 
-    return res.status(201).json({
-      success: true,
-      message: "Registration successful. Welcome email sent.",
-    });
+      return res.status(201).json({
+        success: true,
+        message: "Registration successful. Welcome email sent.",
+      });
+    }
   } catch (err) {
     console.error("Registration Error:", err);
     return res.status(500).json({
@@ -191,23 +197,20 @@ export const updatePassword = async (req, res) => {
 };
 
 //Function to forgot password
-export const forgotPassword = async (req, res) => {
-  const email = String(req.body.email || "").trim().toLowerCase();
-  const otp = req.body.otp;
-  const newPassword = req.body.newPassword;
 
+export const forgotPassword = async (req, res) => {
+  const { email, otp, resetToken, newPassword } = req.body;
+  const lowerEmail = email.toLowerCase();
   if (!email) {
     return res.status(400).json({ success: false, message: "Email is required" });
   }
-
   try {
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(404).json({ success: false, message: "User not found" });
     }
-
-    // STEP 1: Send OTP
-    if (!otp && !newPassword) {
+    // First Hit - email only
+    if (!otp) {
       const htmlContent = `
         <div style="font-family: Arial, sans-serif; line-height: 1.5; max-width: 600px; margin: auto; border: 1px solid #e0e0e0; padding: 20px; border-radius: 10px; background-color: #fafafa;">
           <h2>🔐 Forgot Password OTP</h2>
@@ -219,46 +222,69 @@ export const forgotPassword = async (req, res) => {
       `;
       return await sendOtp(req, res, htmlContent);
     }
-
-    // STEP 2: OTP + New Password → First verify OTP
-    if (otp && newPassword) {
-      // ✅ 1. Verify OTP first
-      const otpResult = await verifyOtp(email, otp);
+    // Second Hit - Email and otp
+    if (otp && !newPassword && !resetToken) {
+      const otpResult = await verifyOtp(lowerEmail, otp);  // e.g. { success, status, message }
       if (!otpResult.success) {
         return res.status(otpResult.status).json(otpResult);
       }
 
-      // ✅ 2. THEN check password
-      if (newPassword.length < 6 || newPassword.length > 100 || newPassword.includes(" ")) {
+      // OTP ok → send JWT reset token (valid 5 min)
+      const token = generateOtpToken(lowerEmail);
+      return res.status(200).json({
+        success: true,
+        status: 200,
+        message: 'OTP verified. Use the reset token to set a new password.',
+        resetToken: token,
+        expiresIn: 300,         // seconds (5 min) – convenient for the client
+      });
+    }
+    // Third Hit - email, otp, resetToken, newPassword
+    if (newPassword && resetToken) {
+      // verify the JWT reset token
+      const tokenResult = await verifyOtpToken(lowerEmail, resetToken);
+      if (!tokenResult.success) {
+        return res.status(tokenResult.status).json(tokenResult);
+      }
+
+      if (newPassword.length < 6) {
         return res.status(400).json({
           success: false,
-          message: "Password must be 6–100 characters and cannot contain spaces",
+          status: 400,
+          message: 'Password must be at least 6 characters.',
         });
       }
 
       const salt = await bcrypt.genSalt(10);
       const hashedPassword = await bcrypt.hash(newPassword, salt);
-      user.password = hashedPassword;
-      user.updatedAt = new Date();
-      await user.save();
+
+      await User.updateOne(
+        { email: lowerEmail },
+        { $set: { password: hashedPassword } }
+      );
 
       return res.status(200).json({
         success: true,
-        message: "Password reset successfully",
+        status: 200,
+        message: 'Password updated successfully.',
       });
+
+
     }
-
-    return res.status(400).json({
-      success: false,
-      message: "Invalid request. Provide both OTP and newPassword to reset.",
-    });
-
+    
+    else {
+      return res.status(400).json({
+          success: false,
+          status: 400,
+          message: 'Required fields not provided',
+        });
+    }
   } catch (err) {
-    console.error("Forgot Password Error:", err.message);
+    console.error('Forgot‑Password Error:', err);
     return res.status(500).json({
       success: false,
-      message: "Server error",
-      error: err.message,
+      status: 500,
+      message: 'Server error.',
     });
   }
 };
