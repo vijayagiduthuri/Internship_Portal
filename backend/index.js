@@ -19,7 +19,9 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 // Import user routes
-app.use("/api/auth", userRoutes);
+app.use("/api/authUsers", userRoutes);
+
+
 
 // CORS configuration
 app.use(
