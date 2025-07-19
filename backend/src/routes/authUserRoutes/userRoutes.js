@@ -4,7 +4,7 @@ import {
   updatePassword,
   registerUser,
   forgotPassword,
-} from "../controllers/userControllers.js";
+} from "../../controllers/authUsers/userControllers.js";
 
 const router = express.Router();
 

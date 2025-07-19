@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
-import Otp from '../models/otpModel.js';
-import { sendMail } from './sendMail.js';
-import { generateOtpToken } from './otpToken.js';
+import Otp from '../models/otpModel/otpModel.js';
+import { sendMail } from '../services/sendMail.js';
+import { generateOtpToken } from '../services/otpToken.js';
 dotenv.config();
 
 export const sendOtp = async (req, res, htmlContent) => {

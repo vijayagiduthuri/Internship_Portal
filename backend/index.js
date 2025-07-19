@@ -2,7 +2,7 @@ import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
-import userRoutes from "./src/routes/userRoutes.js";
+import userRoutes from "./src/routes/authUserRoutes/userRoutes.js";
 import { connectDB } from "./src/lib/db.js";
 
 // Load environment variables
