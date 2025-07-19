@@ -7,6 +7,7 @@ import { generateOtpToken, verifyOtpToken } from "../lib/otpToken.js";
 
 dotenv.config();
 
+//Function to register a user
 export const registerUser = async (req, res) => {
   const { email, userName, password, otp, verifyToken } = req.body;
 
@@ -62,12 +63,10 @@ export const registerUser = async (req, res) => {
           .json({ status: "false", message: "userName already exsists" });
       }
       if (password.length < 6) {
-        return res
-          .status(401)
-          .json({
-            status: "false",
-            message: "password must be at least 6 characters long",
-          });
+        return res.status(401).json({
+          status: "false",
+          message: "password must be at least 6 characters long",
+        });
       }
       await newUser.save();
 
@@ -210,7 +209,6 @@ export const updatePassword = async (req, res) => {
 };
 
 //Function to forgot password
-
 export const forgotPassword = async (req, res) => {
   const { email, otp, resetToken, newPassword } = req.body;
   const lowerEmail = email.toLowerCase();
