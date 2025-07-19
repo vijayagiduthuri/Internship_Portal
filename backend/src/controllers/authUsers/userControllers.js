@@ -3,7 +3,10 @@ import dotenv from "dotenv";
 import User from "../../models/userModel/userModel.js";
 import { sendOtp, verifyOtp } from "../../services/emailServices/sendOtp.js";
 import { sendMail } from "../../services/emailServices/sendMail.js";
-import { generateOtpToken, verifyOtpToken } from "../../services/emailServices/otpToken.js";
+import {
+  generateOtpToken,
+  verifyOtpToken,
+} from "../../services/emailServices/otpToken.js";
 
 dotenv.config();
 
@@ -62,12 +65,10 @@ export const registerUser = async (req, res) => {
           .json({ status: "false", message: "userName already exsists" });
       }
       if (password.length < 6) {
-        return res
-          .status(401)
-          .json({
-            status: "false",
-            message: "password must be at least 6 characters long",
-          });
+        return res.status(401).json({
+          status: "false",
+          message: "password must be at least 6 characters long",
+        });
       }
       await newUser.save();
 

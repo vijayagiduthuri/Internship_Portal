@@ -10,6 +10,7 @@ const companySchema = new mongoose.Schema(
     },
     logo: {
       type: String, // URL to logo image
+      default: "https://via.placeholder.com/150x150.png?text=Logo",
     },
     gst: {
       type: String,
@@ -53,6 +54,8 @@ const companySchema = new mongoose.Schema(
       type: String,
       lowercase: true,
       trim: true,
+      required: true,
+      unique: true,
     },
     phone: {
       type: String,
@@ -85,4 +88,4 @@ const companySchema = new mongoose.Schema(
 
 const Company = mongoose.model("Company", companySchema);
 
-export default Company;
+export default Company;
