@@ -3,6 +3,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 import userRoutes from "./src/routes/authUserRoutes/userRoutes.js";
+import authCompanyRoutes from "./src/routes/authCompanyRoutes/authCompanyRoutes.js";
 import { connectDB } from "./src/lib/db.js";
 
 // Load environment variables
@@ -19,8 +20,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 // Import user routes
-app.use("/api/auth", userRoutes);
-
+app.use("/api/authUsers", userRoutes);
+app.use("/api/authCompany",authCompanyRoutes )
 // CORS configuration
 app.use(
   cors({

@@ -1,9 +1,9 @@
 import bcrypt from "bcrypt";
 import dotenv from "dotenv";
 import User from "../../models/userModel/userModel.js";
-import { sendOtp, verifyOtp } from "../../services/sendOtp.js";
-import { sendMail } from "../../services/sendMail.js";
-import { generateOtpToken, verifyOtpToken } from "../../services/otpToken.js";
+import { sendOtp, verifyOtp } from "../../services/emailServices/sendOtp.js";
+import { sendMail } from "../../services/emailServices/sendMail.js";
+import { generateOtpToken, verifyOtpToken } from "../../services/emailServices/otpToken.js";
 
 dotenv.config();
 
