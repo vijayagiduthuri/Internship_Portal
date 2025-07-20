@@ -11,6 +11,13 @@ dotenv.config();
 
 // Initialize express app
 const app = express();
+// CORS configuration
+app.use(
+  cors({
+    origin: "http://localhost:84", // Replace with your frontend URL
+    credentials: true, // Allow credentials (cookies, authorization headers, etc.)
+  })
+);
 
 // Parse JSON bodies
 app.use(express.json());
@@ -22,13 +29,6 @@ app.use(cookieParser());
 // Import user routes
 app.use("/api/authUsers", userRoutes);
 app.use("/api/authCompany",authCompanyRoutes )
-// CORS configuration
-app.use(
-  cors({
-    origin: "http://localhost:5173", // Replace with your frontend URL
-    credentials: true, // Allow credentials (cookies, authorization headers, etc.)
-  })
-);
 
 // Set the port from environment variable or default to 9000
 const PORT = process.env.PORT || 9000;
