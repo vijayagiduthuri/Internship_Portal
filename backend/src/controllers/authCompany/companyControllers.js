@@ -1,9 +1,4 @@
 import Company from "../../models/companyModel/companyModel.js";
-<<<<<<< HEAD
-export const registerCompany = async (req, res) => {
-    try {
-        const companyData = req.body;
-=======
 import { uploadToCloudinary } from "../../services/imageServices/uploadToCloudinary.js";
 import Recruiter from "../../models/recruiterModel/recruiterModel.js";
 import { sendMail } from "../../services/emailServices/sendMail.js";
@@ -20,7 +15,6 @@ export const registerCompany = async (req, res) => {
         if (typeof companyData.socialLinks === 'string') {
             companyData.socialLinks = JSON.parse(companyData.socialLinks);
         }
->>>>>>> 23f141ffb08dccf39d2a70c6efa07f429aa7e303
         // Check required fields are present or not
         if (!companyData.name || !companyData.email || !companyData.hrContact?.name || !companyData.hrContact?.email) {
             return res.status(400).json({
@@ -40,18 +34,6 @@ export const registerCompany = async (req, res) => {
                 message: 'A company with this email already exists.',
             });
         }
-<<<<<<< HEAD
-
-        const newCompany = new Company({
-            ...companyData,
-            email: lowerEmail,
-            hrContact: {
-                name: companyData.hrContact.name.trim(),
-                email: companyData.hrContact.email.toLowerCase().trim(),
-                phone: companyData.hrContact.phone?.trim() || null,
-            },
-        });
-=======
         let newCompany
         let logoUrl = null;
         if (req.file) {
@@ -78,8 +60,6 @@ export const registerCompany = async (req, res) => {
                 },
             });
         }
->>>>>>> 23f141ffb08dccf39d2a70c6efa07f429aa7e303
-
         await newCompany.save();
         return res.status(201).json({
             success: true,
@@ -104,10 +84,6 @@ export const registerCompany = async (req, res) => {
             error: err.message,
         });
     }
-<<<<<<< HEAD
-}
-=======
-}
 export const verifyCompany = async (req, res) => {
     const { email } = req.body;
     const lowerEmail = email.toLowerCase().trim();
@@ -240,4 +216,3 @@ export const generateCompanyAdminCredential = async (req, res) => {
         });
     }
 };
->>>>>>> 23f141ffb08dccf39d2a70c6efa07f429aa7e303
