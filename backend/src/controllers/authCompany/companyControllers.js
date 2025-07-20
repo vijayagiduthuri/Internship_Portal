@@ -149,18 +149,13 @@ export const generateCompanyAdminCredential = async (req, res) => {
         }
 
         // 2. Check if admin credential already exists
-        const existingCredential = await Recruiter.findOne({
-            company: company._id,
-            role: 'admin',
-        });
-
-        if (existingCredential) {
+        const emailExists = await Recruiter.findOne({ email: lowerEmail });
+        if (emailExists) {
             return res.status(409).json({
                 success: false,
-                message: 'Admin credential already exists for this company.',
+                message: 'Admin credential already exists for this company',
             });
         }
-
         // 3. Generate random password
         const plainPassword = crypto.randomBytes(6).toString('hex'); // 12-char password
         const hashedPassword = await bcrypt.hash(plainPassword, 10);
