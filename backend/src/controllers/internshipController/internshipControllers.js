@@ -1,7 +1,7 @@
 import crypto from "crypto"
-import internshipSchema from "../../models/internshipModel/internshipModel";
+import internshipSchema from "../../models/internshipModel/internshipModel.js";
 import mongoose from "mongoose";
-import { generateInternshipHash } from "../../services/internshipServices/generateInternshipHash";
+import { generateInternshipHash } from "../../services/internshipServices/generateInternshipHash.js";
 
 export const createInternship = async (req, res) => {
     const payload = req.body;
