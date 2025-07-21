@@ -1,5 +1,4 @@
 import { BrowserRouter, Route, Router, Routes } from 'react-router-dom'
-import './App.css'
 import Signup from './pages/signup/Signup'
 import LoginPage from './pages/AuthPages/LoginPage';
 
