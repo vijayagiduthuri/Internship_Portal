@@ -4,6 +4,7 @@ import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 import userRoutes from "./src/routes/authUserRoutes/userRoutes.js";
 import authCompanyRoutes from "./src/routes/authCompanyRoutes/authCompanyRoutes.js";
+import internshipRoutes from "./src/routes/internshipRoutes/internshipRoutes.js";
 import { connectDB } from "./src/lib/db.js";
 
 // Load environment variables
@@ -14,7 +15,7 @@ const app = express();
 // CORS configuration
 app.use(
   cors({
-    origin: "http://localhost:84", // Replace with your frontend URL
+    origin: "http://localhost:5173", // Replace with your frontend URL
     credentials: true, // Allow credentials (cookies, authorization headers, etc.)
   })
 );
@@ -29,6 +30,7 @@ app.use(cookieParser());
 // Import user routes
 app.use("/api/authUsers", userRoutes);
 app.use("/api/authCompany",authCompanyRoutes )
+app.use("/internships", internshipRoutes)
 
 // Set the port from environment variable or default to 9000
 const PORT = process.env.PORT || 9000;

@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 const internshipSchema = new mongoose.Schema({
+  uid : {type:Number, required: true, unique: true},
   title: { type: String, required: true },
   company: { type: String, required: true },
   location: { type: String, required: true },
