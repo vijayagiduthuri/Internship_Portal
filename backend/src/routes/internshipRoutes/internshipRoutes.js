@@ -1,5 +1,5 @@
 import express from "express";
-import { createInternship } from "../../controllers/internshipController/internshipControllers";
+import { createInternship } from "../../controllers/internshipController/internshipControllers.js";
 
 const router = express.Router();
 
