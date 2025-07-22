@@ -1,3 +1,4 @@
+import crypto from "crypto"
 export const generateInternshipHash = async(data) => {
   const normalized = [
     data.title?.trim().toLowerCase(),

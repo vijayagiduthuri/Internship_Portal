@@ -30,7 +30,7 @@ app.use(cookieParser());
 // Import user routes
 app.use("/api/authUsers", userRoutes);
 app.use("/api/authCompany",authCompanyRoutes )
-app.use("/internships", internshipRoutes)
+app.use("/api/internships", internshipRoutes)
 
 // Set the port from environment variable or default to 9000
 const PORT = process.env.PORT || 9000;

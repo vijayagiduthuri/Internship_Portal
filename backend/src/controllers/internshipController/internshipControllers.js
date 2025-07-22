@@ -1,7 +1,7 @@
 import crypto from "crypto"
-import internshipSchema from "../../models/internshipModel/internshipModel";
+import Internship from "../../models/internshipModel/internshipModel.js";
 import mongoose from "mongoose";
-import { generateInternshipHash } from "../../services/internshipServices/generateInternshipHash";
+import { generateInternshipHash } from "../../services/internshipServices/generateInternshipHash.js";
 
 export const createInternship = async (req, res) => {
     const payload = req.body;
@@ -29,10 +29,10 @@ export const createInternship = async (req, res) => {
 
     try {
         // 1. create hash
-        const postHash = generateInternshipHash(payload);
+        const postHash = await generateInternshipHash(payload);
 
         // 2. look for duplicate
-        const duplicate = await internshipSchema.findOne({ postHash });
+        const duplicate = await Internship.findOne({ uid: postHash });
         if (duplicate) {
             return res.status(409).json({
                 success: false,
@@ -41,7 +41,7 @@ export const createInternship = async (req, res) => {
         }
 
         // 3. build new internship doc
-        const newInternship = new internshipSchema({
+        const newInternship = new Internship({
             ...payload,
             uid: postHash,          // quick unique uid;
             postedBy: new mongoose.Types.ObjectId(payload.postedBy)
