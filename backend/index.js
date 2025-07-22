@@ -3,6 +3,8 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 import userRoutes from "./src/routes/authUserRoutes/userRoutes.js";
+import authCompanyRoutes from "./src/routes/authCompanyRoutes/authCompanyRoutes.js";
+import internshipRoutes from "./src/routes/internshipRoutes/internshipRoutes.js";
 import { connectDB } from "./src/lib/db.js";
 
 // Load environment variables
@@ -10,6 +12,13 @@ dotenv.config();
 
 // Initialize express app
 const app = express();
+// CORS configuration
+app.use(
+  cors({
+    origin: "http://localhost:5173", // Replace with your frontend URL
+    credentials: true, // Allow credentials (cookies, authorization headers, etc.)
+  })
+);
 
 // Parse JSON bodies
 app.use(express.json());
@@ -19,15 +28,9 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 // Import user routes
-app.use("/api/auth", userRoutes);
-
-// CORS configuration
-app.use(
-  cors({
-    origin: "http://localhost:5173", // Replace with your frontend URL
-    credentials: true, // Allow credentials (cookies, authorization headers, etc.)
-  })
-);
+app.use("/api/authUsers", userRoutes);
+app.use("/api/authCompany",authCompanyRoutes )
+app.use("/api/internships", internshipRoutes)
 
 // Set the port from environment variable or default to 9000
 const PORT = process.env.PORT || 9000;
