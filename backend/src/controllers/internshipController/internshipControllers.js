@@ -1,4 +1,4 @@
-import crypto from "crypto"
+import crypto from "crypto";
 import Internship from "../../models/internshipModel/internshipModel.js";
 import mongoose from "mongoose";
 import { generateInternshipHash } from "../../services/internshipServices/generateInternshipHash.js";
@@ -111,15 +111,14 @@ export const getInternshipById = async (req, res) => {
   try {
     const internship = await Internship.findById(id);
     if (!internship) {
-      return res.status(404).json({
+       return res.status(404).json({
         success: false,
         message: "Internship not found",
       });
     }
-
-    res.status(200).json({
+     res.status(200).json({
       success: true,
-      message: "Internship fetched successfully",
+        message: "Internship fetched successfully",
       data: internship,
     });
   } catch (error) {
@@ -130,4 +129,42 @@ export const getInternshipById = async (req, res) => {
       error: error.message,
     });
   }
+};
+
+
+//update internship
+export const updateInternship = async (req, res) => {
+  const { id } = req.params; // internship id
+  const updates = req.body;
+
+  // Prevent changing the uid
+  if (updates.uid) {
+    delete updates.uid;
+  }
+
+  try {
+    const updatedInternship = await Internship.findByIdAndUpdate(id, updates, {
+      new: true,
+    });
+
+    if (!updatedInternship) {
+      return res.status(404).json({
+        success: false,
+        message: "Internship not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Internship updated successfully",
+      data: updatedInternship,
+    });
+  } catch (err) {
+    console.error("Update‑Internship error:", err);
+    res.status(500).json({
+      success: false,
+      message: "Server error while updating internship.",
+      error: err.message,
+    });
+  }
 };
