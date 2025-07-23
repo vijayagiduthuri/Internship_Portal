@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 const internshipSchema = new mongoose.Schema({
-  uid : {type:Number, required: true, unique: true},
+  uid: { type: String, required: true, unique: true },
   title: { type: String, required: true },
   company: { type: String, required: true },
   location: { type: String, required: true },
@@ -23,5 +23,5 @@ const internshipSchema = new mongoose.Schema({
   isActive: { type: Boolean, default: true },
   category: { type: String },
 });
-
-export default internshipSchema;
+const Internship = mongoose.model("Internship", internshipSchema);
+export default Internship;
