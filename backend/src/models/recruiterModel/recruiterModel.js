@@ -1,11 +1,10 @@
-
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 const recruiterSchema = new mongoose.Schema(
   {
     companyId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Company',
+      ref: "Company",
       required: true,
     },
     name: {
@@ -18,7 +17,7 @@ const recruiterSchema = new mongoose.Schema(
       required: true,
       lowercase: true,
       unique: true,
-      match: [/.+\@.+\..+/, 'Invalid email format'],
+      match: [/.+\@.+\..+/, "Invalid email format"],
     },
     phone: {
       type: String,
@@ -26,8 +25,8 @@ const recruiterSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      enum: ['admin', 'recruiter', 'viewer'],
-      default: 'recruiter',
+      enum: ["admin", "recruiter", "viewer"],
+      default: "recruiter",
     },
     password: {
       type: String,
@@ -45,5 +44,5 @@ const recruiterSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const Recruiter = mongoose.model('Recruiter', recruiterSchema);
+const Recruiter = mongoose.model("Recruiter", recruiterSchema);
 export default Recruiter;
