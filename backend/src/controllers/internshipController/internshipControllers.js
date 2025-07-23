@@ -3,7 +3,7 @@ import Internship from "../../models/internshipModel/internshipModel.js";
 import mongoose from "mongoose";
 import { generateInternshipHash } from "../../services/internshipServices/generateInternshipHash.js";
 
-//create internship
+// Create Internship
 export const createInternship = async (req, res) => {
   const payload = req.body;
   if (
@@ -39,15 +39,15 @@ export const createInternship = async (req, res) => {
     if (duplicate) {
       return res.status(409).json({
         success: false,
-        message: "Duplicate internship post. A similar listing already exists.",
+        message: "Duplicate internship post. A similar listing already exists."
       });
     }
 
     // 3. build new internship doc
     const newInternship = new Internship({
       ...payload,
-      uid: postHash, // quick unique uid;
-      postedBy: new mongoose.Types.ObjectId(payload.postedBy),
+      uid: postHash,          // quick unique uid;
+      postedBy: new mongoose.Types.ObjectId(payload.postedBy)
     });
     // 4. save
     await newInternship.save();
@@ -66,6 +66,71 @@ export const createInternship = async (req, res) => {
     });
   }
 };
+
+// Get All internships
+export const getAllInternships = async (req, res) => {
+  try {
+    const internships = await Internship.find().sort({ createdAt: -1 });
+    res.status(200).json(internships);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to fetch internships", error });
+  }
+};
+
+// Delete Internship
+export const deleteInternship = async (req, res) => {
+  const { id } = req.params; // extract the internship id from URL
+
+  try {
+    const deleted = await Internship.findByIdAndDelete(id);
+    if (!deleted) {
+      return res.status(404).json({
+        success: false,
+        message: "Internship not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Internship deleted successfully",
+      data: deleted,
+    });
+  } catch (error) {
+    console.error("Delete‑Internship error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error while deleting internship",
+      error: error.message,
+    });
+  }
+};
+
+// Get Internship
+export const getInternshipById = async (req, res) => {
+  const { id } = req.params; // get internship id from URL params
+  try {
+    const internship = await Internship.findById(id);
+    if (!internship) {
+       return res.status(404).json({
+        success: false,
+        message: "Internship not found",
+      });
+    }
+     res.status(200).json({
+      success: true,
+        message: "Internship fetched successfully",
+      data: internship,
+    });
+  } catch (error) {
+    console.error("Get-Internship error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error while fetching internship",
+      error: error.message,
+    });
+  }
+};
+
 
 //update internship
 export const updateInternship = async (req, res) => {
@@ -100,6 +165,6 @@ export const updateInternship = async (req, res) => {
       success: false,
       message: "Server error while updating internship.",
       error: err.message,
-    });
-  }
+    });
+  }
 };
