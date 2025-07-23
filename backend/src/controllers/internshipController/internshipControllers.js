@@ -1,4 +1,4 @@
-import crypto from "crypto";
+import crypto from "crypto"
 import Internship from "../../models/internshipModel/internshipModel.js";
 import mongoose from "mongoose";
 import { generateInternshipHash } from "../../services/internshipServices/generateInternshipHash.js";
@@ -29,27 +29,25 @@ export const createInternship = async (req, res) => {
         "Required fields: title, company, location, stipend, duration, startDate, applyBy, skillsRequired (non-empty array), description, responsibilities (non-empty array), postedBy.",
     });
   }
+    try {
+        // 1. create hash
+        const postHash = await generateInternshipHash(payload);
 
-  try {
-    // 1. create hash
-    const postHash = await generateInternshipHash(payload);
+        // 2. look for duplicate
+        const duplicate = await Internship.findOne({ uid: postHash });
+        if (duplicate) {
+            return res.status(409).json({
+                success: false,
+                message: "Duplicate internship post. A similar listing already exists."
+            });
+        }
 
-    // 2. look for duplicate
-    const duplicate = await Internship.findOne({ uid: postHash });
-    if (duplicate) {
-      return res.status(409).json({
-        success: false,
-        message: "Duplicate internship post. A similar listing already exists.",
-      });
-    }
-
-    // 3. build new internship doc
-    const newInternship = new Internship({
-      ...payload,
-      uid: postHash, // quick unique uid;
-      postedBy: new mongoose.Types.ObjectId(payload.postedBy),
-    });
-
+        // 3. build new internship doc
+        const newInternship = new Internship({
+            ...payload,
+            uid: postHash,          // quick unique uid;
+            postedBy: new mongoose.Types.ObjectId(payload.postedBy)
+        });
     // 4. save
     await newInternship.save();
 
