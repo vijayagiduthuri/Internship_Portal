@@ -84,6 +84,7 @@ export const registerCompany = async (req, res) => {
             error: err.message,
         });
     }
+}
 export const verifyCompany = async (req, res) => {
     const { email } = req.body;
     const lowerEmail = email.toLowerCase().trim();
