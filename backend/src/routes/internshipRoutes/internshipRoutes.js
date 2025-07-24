@@ -4,7 +4,8 @@ import {
   createInternship,
   updateInternship,
   getAllInternships,
-  getInternshipById 
+  getInternshipById,
+  deleteInternship
 } from "../../controllers/internshipController/internshipControllers.js";
 
 const router = express.Router();
