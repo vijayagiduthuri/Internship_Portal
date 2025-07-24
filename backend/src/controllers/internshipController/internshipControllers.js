@@ -1,5 +1,6 @@
 import crypto from "crypto";
 import Internship from "../../models/internshipModel/internshipModel.js";
+import Application from "../../models/applicationModel/applicationModel.js";
 import mongoose from "mongoose";
 import { generateInternshipHash } from "../../services/internshipServices/generateInternshipHash.js";
 
@@ -169,3 +170,31 @@ export const updateInternship = async (req, res) => {
   }
 };
 
+// Get Applications by Internship Id
+export const getApplicationsByInternshipId = async (req, res) => {
+  try {
+    const internshipId = req.params.id;
+    const internship = await Internship.findById(internshipId);
+    if (!internship) {
+      return res.status(404).json({
+        success: false,
+        message: "Internship not found",
+      });
+    }
+
+    const applications = await Application.find({ internshipId });
+
+    if (applications.length === 0) {
+      return res.status(404).json({ message: "No applications found for this internship" });
+    }
+
+    res.status(200).json({
+      message: "Applications fetched successfully",
+      count: applications.length,
+      applications,
+    });
+  } catch (error) {
+    console.error("Error fetching applications:", error);
+    res.status(500).json({ message: "Server Error", error: error.message });
+  }
+};
