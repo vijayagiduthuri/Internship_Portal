@@ -5,7 +5,8 @@ import {
   updateInternship,
   getAllInternships,
   getInternshipById,
-  deleteInternship
+  deleteInternship,
+  getApplicationsByInternshipId
 } from "../../controllers/internshipController/internshipControllers.js";
 import { 
     applyInternship
@@ -24,4 +25,6 @@ router.put("/update-internship/:id", updateInternship);
 router.delete("/delete-internship/:id", deleteInternship);
 
 router.post("/apply-internship",protectRoute, applyInternship)
+
+router.get("/get-applications-by-id/:id", getApplicationsByInternshipId)
 export default router;
