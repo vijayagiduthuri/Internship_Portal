@@ -13,8 +13,8 @@ router.post("/register", registerUser);
 
 router.post("/login", loginUser);
 
-router.post("/update-password",protectRoute, updatePassword);
+router.post("/update-password", protectRoute, updatePassword);
 
-router.post('/forgot-password',forgotPassword)
+router.post("/forgot-password", forgotPassword);
 
 export default router;

@@ -168,3 +168,4 @@ export const updateInternship = async (req, res) => {
     });
   }
 };
+

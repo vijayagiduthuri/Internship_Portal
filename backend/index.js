@@ -5,7 +5,7 @@ import dotenv from "dotenv";
 import userRoutes from "./src/routes/authUserRoutes/userRoutes.js";
 import authCompanyRoutes from "./src/routes/authCompanyRoutes/authCompanyRoutes.js";
 import internshipRoutes from "./src/routes/internshipRoutes/internshipRoutes.js";
-import profileRoutes from "./src/routes/profileRoutes/profileRoutes.js"
+import profileRoutes from "./src/routes/profileRoutes/profileRoutes.js";
 import { connectDB } from "./src/lib/db.js";
 
 // Load environment variables
@@ -30,9 +30,9 @@ app.use(cookieParser());
 
 // Import user routes
 app.use("/api/authUsers", userRoutes);
-app.use("/api/authCompany",authCompanyRoutes )
-app.use("/api/internships", internshipRoutes)
-app.use("/api/profile",profileRoutes )
+app.use("/api/authCompany", authCompanyRoutes);
+app.use("/api/internships", internshipRoutes);
+app.use("/api/profile", profileRoutes);
 
 // Set the port from environment variable or default to 9000
 const PORT = process.env.PORT || 9000;
