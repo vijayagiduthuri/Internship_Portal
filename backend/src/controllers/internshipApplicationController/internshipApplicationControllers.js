@@ -1,5 +1,5 @@
-import Application from "../../models/application.model.js";
-import Internship from "../../models/internship.model.js"; // For validation (optional)
+import Application from "../../models/applicationModel/applicationModel.js";
+import Internship from "../../models/internshipModel/internshipModel.js";
 
 export const applyInternship = async (req, res) => {
   try {
@@ -20,6 +20,11 @@ export const applyInternship = async (req, res) => {
     // if (!internshipExists) {
     //   return res.status(404).json({ message: "Internship not found" });
     // }
+
+    const internship = await Internship.findById(internshipId);
+    if (!internship) {
+      return res.status(404).json({ message: "Internship not found" });
+    }
 
     // ✅ Check if already applied
     const alreadyApplied = await Application.findOne({
