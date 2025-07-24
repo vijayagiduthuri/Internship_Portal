@@ -30,11 +30,11 @@ export const updateProfile = async (req, res) => {
     const userName = req.params.userName; // Extract from URL params
     const updatedData = req.body;
 
-       const userExists = await User.findOne({ userName });
+    const userExists = await User.findOne({ userName });
     if (!userExists) {
       return res.status(404).json({ message: "User not found" });
     }
-    
+
     const updatedProfile = await Profile.findOneAndUpdate(
       { userName: userName },
       {

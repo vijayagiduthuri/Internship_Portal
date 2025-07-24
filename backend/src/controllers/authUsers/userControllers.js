@@ -7,6 +7,7 @@ import {
   generateOtpToken,
   verifyOtpToken,
 } from "../../services/emailServices/otpToken.js";
+import { generateToken } from "../../lib/utils.js";
 
 dotenv.config();
 
@@ -125,7 +126,7 @@ export const loginUser = async (req, res) => {
     if (!isMatch) {
       return res.status(401).json({ message: "Invalid email or password" });
     }
-
+    generateToken(user._id, res);
     // If everything is okay, login successful
     res.status(200).json({
       message: "Login successful",
