@@ -111,14 +111,14 @@ export const getInternshipById = async (req, res) => {
   try {
     const internship = await Internship.findById(id);
     if (!internship) {
-       return res.status(404).json({
+      return res.status(404).json({
         success: false,
         message: "Internship not found",
       });
     }
-     res.status(200).json({
+    res.status(200).json({
       success: true,
-        message: "Internship fetched successfully",
+      message: "Internship fetched successfully",
       data: internship,
     });
   } catch (error) {
@@ -165,7 +165,7 @@ export const updateInternship = async (req, res) => {
       success: false,
       message: "Server error while updating internship.",
       error: err.message,
-    });
-  }
+    });
+  }
 };
 
