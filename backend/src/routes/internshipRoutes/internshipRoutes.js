@@ -5,7 +5,7 @@ import {
   updateInternship,
   getAllInternships,
   getInternshipById,
-  deleteInternship,
+  deleteInternship
 } from "../../controllers/internshipController/internshipControllers.js";
 
 const router = express.Router();
