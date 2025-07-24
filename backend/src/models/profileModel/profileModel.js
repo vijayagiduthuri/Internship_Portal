@@ -1,9 +1,9 @@
 import mongoose from "mongoose";
 const profileSchema = new mongoose.Schema(
   {
-    user: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User", // assuming you have a separate User model
+    userName: {
+      type: String,
+      unique: true,
       required: true,
     },
 
