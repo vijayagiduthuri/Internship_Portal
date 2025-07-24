@@ -5,6 +5,7 @@ import {
   registerUser,
   forgotPassword,
 } from "../../controllers/authUsers/userControllers.js";
+import { protectRoute } from "../../middlewares/jwtToken.js";
 
 const router = express.Router();
 
@@ -12,7 +13,7 @@ router.post("/register", registerUser);
 
 router.post("/login", loginUser);
 
-router.post("/update-password", updatePassword);
+router.post("/update-password",protectRoute, updatePassword);
 
 router.post('/forgot-password',forgotPassword)
 
