@@ -9,7 +9,7 @@ const internshipSchema = new mongoose.Schema({
   companyId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Company",
-    required: true
+    required: true,
   },
   title: { type: String, required: true },
   company: { type: String, required: true },
@@ -18,13 +18,13 @@ const internshipSchema = new mongoose.Schema({
   duration: { type: String, required: true },
   startDate: { type: String, required: true },
   applyBy: { type: Date, required: true },
-  skillsRequired: { type: [String], required: true , default:[]},
+  skillsRequired: { type: [String], required: true, default: [] },
   description: { type: String, required: true },
-  responsibilities: { type: [String], required: true, default:[] },
+  responsibilities: { type: [String], required: true, default: [] },
   createdAt: { type: Date, default: Date.now },
   openings: { type: Number, default: 1, min: 1 },
   workType: { type: String, enum: ["Remote", "In-office", "Hybrid"] },
-  perks: { type: [String] , default: []},
+  perks: { type: [String], default: [] },
   isActive: { type: Boolean, default: true },
   category: { type: String },
 });
