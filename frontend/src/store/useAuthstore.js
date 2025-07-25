@@ -1,7 +1,5 @@
 import { create } from 'zustand';
-import axios from 'axios';
 import { axiosInstance } from '../lib/axios';
-import { useNavigate } from 'react-router-dom';
 
 export const useSignupStore = create((set, get) => ({
   phase: 'email',
@@ -16,6 +14,7 @@ export const useSignupStore = create((set, get) => ({
   userName: '',
   password: '',
   verifyToken: '',
+  
 
   setEmail: (val) => set({ email: val, emailError: false }),
   setOtp: (val) => set({ otp: val, otpError: false }),
@@ -143,4 +142,8 @@ export const useSignupStore = create((set, get) => ({
   },
 
   isGmail: (val) => /^[a-zA-Z0-9._%+-]+@gmail\.com$/.test(val),
+
+  handlLogin : ()=>{
+
+  },
 }));
