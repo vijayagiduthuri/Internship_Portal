@@ -232,3 +232,36 @@ export const generateCompanyAdminCredential = async (req, res) => {
     });
   }
 };
+export const updateCompany = async (req, res) => {
+  try {
+    const { id } = req.params; // MongoDB ObjectId
+    const updates = req.body;
+
+    // Prevent changing unique identifiers directly, if needed
+    delete updates._id;
+    delete updates.email; // if email shouldn't be changed
+    delete updates.gst;   // optionally prevent gst/cin changes
+    delete updates.cin;
+
+    const updatedCompany = await Company.findByIdAndUpdate(
+      id,
+      { $set: updates },
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedCompany) {
+      return res.status(404).json({ message: "Company not found" });
+    }
+
+    res.status(200).json({
+      message: "Company updated successfully",
+      company: updatedCompany,
+    });
+  } catch (error) {
+    console.error("Error updating company:", error);
+    res.status(500).json({
+      message: "Failed to update company",
+      error: error.message,
+    });
+  }
+};

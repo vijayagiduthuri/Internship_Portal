@@ -4,6 +4,7 @@ import {
   registerCompany,
   verifyCompany,
   generateCompanyAdminCredential,
+  updateCompany,
 } from "../../controllers/authCompany/companyControllers.js";
 
 const router = express.Router();
@@ -14,4 +15,5 @@ router.post("/verify", verifyCompany);
 
 router.post("/generate", generateCompanyAdminCredential);
 
+router.post("/update-company/:id",updateCompany )
 export default router;
