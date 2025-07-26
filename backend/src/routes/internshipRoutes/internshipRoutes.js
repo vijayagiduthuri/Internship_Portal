@@ -6,18 +6,42 @@ import {
   getAllInternships,
   getInternshipById,
   deleteInternship,
+  getApplicationsByInternshipId,
 } from "../../controllers/internshipController/internshipControllers.js";
-
+import { applyInternship } from "../../controllers/internshipApplicationController/internshipApplicationControllers.js";
+import { protectRoute } from "../../middlewares/jwtToken.js";
+import {
+  checkRecruiter,
+  checkRecuiterOrganisation,
+} from "../../middlewares/recruiterMiddlewares.js";
 const router = express.Router();
 
-router.post("/create-internship", createInternship);
+router.post("/create-internship", checkRecruiter, createInternship);
 
 router.get("/get-all-internships", getAllInternships);
 
 router.get("/get-internship-id/:id", getInternshipById);
 
-router.put("/update-internship/:id", updateInternship);
+router.put(
+  "/update-internship/:id",
+  checkRecruiter,
+  checkRecuiterOrganisation,
+  updateInternship
+);
 
-router.delete("/delete-internship/:id", deleteInternship);
+router.delete(
+  "/delete-internship/:id",
+  checkRecruiter,
+  checkRecuiterOrganisation,
+  deleteInternship
+);
 
+router.post("/apply-internship", protectRoute, applyInternship);
+
+router.get(
+  "/get-applications-by-id/:id",
+  checkRecruiter,
+  checkRecuiterOrganisation,
+  getApplicationsByInternshipId
+);
 export default router;

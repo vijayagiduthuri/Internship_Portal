@@ -1,5 +1,6 @@
 import crypto from "crypto";
 import Internship from "../../models/internshipModel/internshipModel.js";
+import Application from "../../models/applicationModel/applicationModel.js";
 import mongoose from "mongoose";
 import { generateInternshipHash } from "../../services/internshipServices/generateInternshipHash.js";
 
@@ -20,14 +21,13 @@ export const createInternship = async (req, res) => {
     !payload.description ||
     !payload.responsibilities ||
     !Array.isArray(payload.responsibilities) ||
-    payload.responsibilities.length === 0 ||
-    !payload.postedBy
+    payload.responsibilities.length === 0 
   ) {
     return res.status(400).json({
       success: false,
       status: 400,
       message:
-        "Required fields: title, company, location, stipend, duration, startDate, applyBy, skillsRequired (non-empty array), description, responsibilities (non-empty array), postedBy.",
+        "Required fields: title, company, location, stipend, duration, startDate, applyBy, skillsRequired (non-empty array), description, responsibilities (non-empty array).",
     });
   }
   try {
@@ -42,12 +42,13 @@ export const createInternship = async (req, res) => {
         message: "Duplicate internship post. A similar listing already exists."
       });
     }
-
     // 3. build new internship doc
     const newInternship = new Internship({
       ...payload,
       uid: postHash,          // quick unique uid;
-      postedBy: new mongoose.Types.ObjectId(payload.postedBy)
+      recruiterId: req.recruiter.id,
+      companyId: req.recruiter.companyId
+
     });
     // 4. save
     await newInternship.save();
@@ -111,14 +112,14 @@ export const getInternshipById = async (req, res) => {
   try {
     const internship = await Internship.findById(id);
     if (!internship) {
-       return res.status(404).json({
+      return res.status(404).json({
         success: false,
         message: "Internship not found",
       });
     }
-     res.status(200).json({
+    res.status(200).json({
       success: true,
-        message: "Internship fetched successfully",
+      message: "Internship fetched successfully",
       data: internship,
     });
   } catch (error) {
@@ -165,6 +166,35 @@ export const updateInternship = async (req, res) => {
       success: false,
       message: "Server error while updating internship.",
       error: err.message,
-    });
-  }
+    });
+  }
+};
+
+// Get Applications by Internship Id
+export const getApplicationsByInternshipId = async (req, res) => {
+  try {
+    const internshipId = req.params.id;
+    const internship = await Internship.findById(internshipId);
+    if (!internship) {
+      return res.status(404).json({
+        success: false,
+        message: "Internship not found",
+      });
+    }
+
+    const applications = await Application.find({ internshipId });
+
+    if (applications.length === 0) {
+      return res.status(404).json({ message: "No applications found for this internship" });
+    }
+
+    res.status(200).json({
+      message: "Applications fetched successfully",
+      count: applications.length,
+      applications,
+    });
+  } catch (error) {
+    console.error("Error fetching applications:", error);
+    res.status(500).json({ message: "Server Error", error: error.message });
+  }
 };

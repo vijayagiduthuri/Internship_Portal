@@ -1,13 +1,13 @@
 import express from "express";
-import { 
-    updateProfile,
-    getProfileByUserName
- } from "../../controllers/profileControllers/profileControllers.js";
-  
- const router = express.Router();
+import {
+  updateProfile,
+  getProfileByUserName,
+} from "../../controllers/profileController/profileControllers.js";
 
- router.get("/get-profile/:userName", getProfileByUserName)
- 
- router.put("/update-profile/:userName", updateProfile)
- 
- export default router
+const router = express.Router();
+
+router.get("/get-profile/:userName", getProfileByUserName);
+
+router.put("/update-profile/:userName", updateProfile);
+
+export default router;
