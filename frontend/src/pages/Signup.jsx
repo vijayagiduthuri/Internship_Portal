@@ -205,7 +205,7 @@ useEffect(() => {
           </div>
           <button
             className="w-full py-3 mt-2 bg-gradient-to-r from-[#8b39fa] to-[#470899] rounded-md font-bold cursor-pointer"
-            onClick={handleSignupPhase(navigate)}
+            onClick={() => handleSignupPhase(navigate)}
             disabled={loading || !userName || !password}
           >
             {loading ? "Signing up..." : "Sign Up"}
