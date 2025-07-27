@@ -1,6 +1,7 @@
 import bcrypt from "bcrypt";
 import dotenv from "dotenv";
 import User from "../../models/userModel/userModel.js";
+import Application from '../../models/applicationModel/applicationModel.js'
 import { sendOtp, verifyOtp } from "../../services/emailServices/sendOtp.js";
 import { sendMail } from "../../services/emailServices/sendMail.js";
 import {
@@ -11,6 +12,7 @@ import { generateToken } from "../../lib/utils.js";
 
 dotenv.config();
 
+//Function to register a user
 export const registerUser = async (req, res) => {
   const { email, userName, password, otp, verifyToken } = req.body;
 
@@ -212,7 +214,6 @@ export const updatePassword = async (req, res) => {
 };
 
 //Function to forgot password
-
 export const forgotPassword = async (req, res) => {
   const { email, otp, resetToken, newPassword } = req.body;
   const lowerEmail = email.toLowerCase();
@@ -303,3 +304,70 @@ export const forgotPassword = async (req, res) => {
     });
   }
 };
+
+//Function to get all the applications applied by a specific user
+export const getApplicationsByApplicantId = async (req, res) => {
+  const { applicantId } = req.params;
+
+  if (!applicantId) {
+    return res.status(400).json({
+      success: false,
+      message: "Applicant ID is required",
+    });
+  }
+
+  try {
+    const user = await User.findById(applicantId);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    const applications = await Application.find({ applicantId })
+      .populate({
+        path: "internshipId",
+        select: "title company location duration",
+      })
+      .sort({ createdAt: -1 });
+
+    if (!applications || applications.length === 0) {
+      return res.status(200).json({
+        success: true,
+        message: "No internships applied by this user yet.",
+        applications: [],
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      count: applications.length,
+      applications,
+    });
+  } catch (error) {
+    console.error("Error fetching applications by applicantId:", error.message);
+    return res.status(500).json({
+      success: false,
+      message: "Server error",
+    });
+  }
+};
+
+//Function for user logout
+export const logoutUser = (req, res) => {
+  try {
+    res.cookie("jwt", "", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 0,
+    });
+
+    res.status(200).json({ message: "User logged out successfully" });
+  } catch (e) {
+    console.error("Error during logout:", e.message);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+

@@ -132,7 +132,6 @@ export const getInternshipById = async (req, res) => {
   }
 };
 
-
 //update internship
 export const updateInternship = async (req, res) => {
   const { id } = req.params; // internship id
