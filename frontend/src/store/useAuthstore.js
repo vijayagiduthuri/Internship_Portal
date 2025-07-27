@@ -1,10 +1,10 @@
 import { create } from 'zustand';
 import { axiosInstance } from '../lib/axios';
+import toast from '../components/Toast';
 
-export const useSignupStore = create((set, get) => ({
+export const useAuthstore = create((set, get) => ({
   phase: 'email',
   loading: false,
-  toast: '',
   emailError: false,
   otpError: false,
   credentialsError: { userName: false, password: false },
@@ -20,25 +20,16 @@ export const useSignupStore = create((set, get) => ({
   setOtp: (val) => set({ otp: val, otpError: false }),
   setUserName: (val) => set({ userName: val }),
   setPassword: (val) => set({ password: val }),
-  setToast: (msg) => {
-    set({ toast: msg });
-    setTimeout(() => set({ toast: '' }), 3500);
-  },
-  clearToast: () => set({ toast: '' }),
-
-  showToast: (msg) => {
-    get().setToast(msg);
-  },
   triggerShake: (key) => {
     set((state) => ({ [key]: true }));
     setTimeout(() => set({ [key]: false }), 700);
   },
 
- handleEmailPhase: async () => {
-  const { email, isGmail, triggerShake, showToast } = get();
+ handleEmailPhase: async (toast) => {
+  const { email, isGmail, triggerShake,} = get();
 
   if (!isGmail(email.trim())) {
-    showToast("Enter a valid email address");
+    toast.error("Enter a valid email address");
     triggerShake("emailError");
     return;
   }
@@ -49,7 +40,7 @@ export const useSignupStore = create((set, get) => ({
     const res = await axiosInstance.post('/api/authUsers/register', { email });
     
     if (res.status === 200 && res.data?.success) {
-      showToast("OTP sent! Check your Gmail.");
+      toast.success("OTP sent! Check your Gmail.");
       set({ phase: "otp" });
     } else {
       showToast(res?.data?.message || "Failed to send OTP");
@@ -57,14 +48,14 @@ export const useSignupStore = create((set, get) => ({
 
   } catch (error) {
     const msg = error?.response?.data?.message || "Server error.";
-    showToast(msg);
+    toast.error(msg);
     triggerShake("emailError");
   } finally {
     set({ loading: false });
   }
 },
 
-  handleOtpPhase: async (enteredOtp) => {
+  handleOtpPhase: async (enteredOtp,toast) => {
     const otpStr = (enteredOtp || get().otp).join("");
     set({ loading: true });
     try {
@@ -77,23 +68,23 @@ export const useSignupStore = create((set, get) => ({
           verifyToken: res.data.verifyToken,
           phase: "credentials",
         });
-        get().showToast("OTP verified!");
+        toast.success("OTP verified!");
       } else {
-        showToast(res.data.message);
+        toast.error(res.data.message);
         set({ otp: ["", "", "", "", "", ""] });
         get().triggerShake("otpError");
       }
     } catch (error) {
         console.log(error.message);
       set({ otp: ["", "", "", "", "", ""] });
-      get().showToast("Enter valid OTP");
+      toast.error("Enter valid OTP");
       get().triggerShake("otpError");
     } finally {
       set({ loading: false });
     }
   },
 
-  handleSignupPhase: async (navigate) => {
+  handleSignupPhase: async (navigate,toast) => {
     const { email, userName, password, verifyToken } = get();
     const errors = {};
     let hasErr = false;
@@ -119,12 +110,12 @@ export const useSignupStore = create((set, get) => ({
         password,
         verifyToken,
       });
-      if(res.status===401) showToast(res.data.message)
+      if(res.status===401) toast.error(res.data.message)
       else if (res.status === 201 && res.data.success) {
-        get().showToast(res.data.message || "Registration successful!");
-        setTimeout(() => navigate("/signin"), 1300);
+        toast.success(res.data.message || "Registration successful!");
+        setTimeout(() => navigate("/"), 1300);
       } else {
-        get().showToast(res.data.message || "Signup failed.");
+        toast.error(res.data.message || "Signup failed.");
       }
     } catch (error) {
       const msg = error.response?.data?.message?.toLowerCase() || "";
@@ -134,7 +125,7 @@ export const useSignupStore = create((set, get) => ({
         get().triggerShake("credentialsError");
       } else {
         console.log(error.message);
-        get().showToast(msg || "Server error.");
+        toast.error(msg || "Server error.");
       }
     } finally {
       set({ loading: false });
@@ -142,8 +133,23 @@ export const useSignupStore = create((set, get) => ({
   },
 
   isGmail: (val) => /^[a-zA-Z0-9._%+-]+@gmail\.com$/.test(val),
-
   handlLogin : ()=>{
-
   },
+  //login page authentication
+  handleLogin :async (formData)=>
+  {
+    try {
+      const res = await axiosInstance.post('/api/authUsers/login', formData);
+      if(res.status===400 || res.status===401 ) toast.error(res.data.message);
+      else if (res.status === 200 && res.data.success) {
+        toast.success(res.data.message || "Login successful!");
+        setTimeout(() => navigate("/"), 1300);
+      } else {
+        toast.error(res.data.message || "Login failed.");
+      }
+    }
+    catch(err){
+        toast.error(err.response?.data?.message || "Server error.");
+      }
+  }
 }));
