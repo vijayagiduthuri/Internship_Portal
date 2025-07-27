@@ -5,7 +5,8 @@ import Recruiter from "../../models/recruiterModel/recruiterModel.js";
 import { sendMail } from "../../services/emailServices/sendMail.js";
 import { sendOtp, verifyOtp } from "../../services/emailServices/sendOtp.js";
 import { generateOtpToken,verifyOtpToken } from "../../services/emailServices/otpToken.js";
-//Function to login a user
+
+//Function to login a recruiter
 export const loginRecruiter = async (req, res) => {
   const { email, password } = req.body;
 
@@ -45,6 +46,7 @@ export const loginRecruiter = async (req, res) => {
   }
 };
 
+//Function to create a recruiter
 export const createRecruiter = async (req, res) => {
   const { email,name } = req.body;
   if (req.recruiter.role !== 'admin')
@@ -104,6 +106,7 @@ export const createRecruiter = async (req, res) => {
   }
 };
 
+//Function to update recruiter password
 export const updateRecruiterPassword = async (req, res) => {
   const email = String(req.body.email || "").trim();
   const currentPassword = String(req.body.currentPassword || "").trim();
@@ -165,6 +168,8 @@ export const updateRecruiterPassword = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
+//Function to set password of a recruiter(forgot)
 export const forgotRecruiterPassword = async (req, res) => {
   const { email, otp, resetToken, newPassword } = req.body;
   const lowerEmail = email?.toLowerCase();
@@ -259,6 +264,8 @@ export const forgotRecruiterPassword = async (req, res) => {
     });
   }
 }
+
+//Function to logout recruiter
 export const logoutRecruiter = async (req, res) => {
   try {
     res.clearCookie("token");
