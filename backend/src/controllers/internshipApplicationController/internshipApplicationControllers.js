@@ -1,6 +1,7 @@
 import Application from "../../models/applicationModel/applicationModel.js";
 import Internship from "../../models/internshipModel/internshipModel.js";
 
+//Function to apply an internship
 export const applyInternship = async (req, res) => {
   try {
     const {

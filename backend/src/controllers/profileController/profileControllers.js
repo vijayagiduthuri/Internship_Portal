@@ -1,7 +1,7 @@
 import Profile from "../../models/profileModel/profileModel.js";
 import User from "../../models/userModel/userModel.js";
 
-// Get Profile from UserName
+// Get Profile of a UserName
 export const getProfileByUserName = async (req, res) => {
   try {
     const userName = req.params.userName; // e.g., /api/profile/:userName

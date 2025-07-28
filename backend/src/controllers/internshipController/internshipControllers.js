@@ -21,14 +21,13 @@ export const createInternship = async (req, res) => {
     !payload.description ||
     !payload.responsibilities ||
     !Array.isArray(payload.responsibilities) ||
-    payload.responsibilities.length === 0 ||
-    !payload.postedBy
+    payload.responsibilities.length === 0 
   ) {
     return res.status(400).json({
       success: false,
       status: 400,
       message:
-        "Required fields: title, company, location, stipend, duration, startDate, applyBy, skillsRequired (non-empty array), description, responsibilities (non-empty array), postedBy.",
+        "Required fields: title, company, location, stipend, duration, startDate, applyBy, skillsRequired (non-empty array), description, responsibilities (non-empty array).",
     });
   }
   try {
@@ -43,12 +42,13 @@ export const createInternship = async (req, res) => {
         message: "Duplicate internship post. A similar listing already exists."
       });
     }
-
     // 3. build new internship doc
     const newInternship = new Internship({
       ...payload,
       uid: postHash,          // quick unique uid;
-      postedBy: new mongoose.Types.ObjectId(payload.postedBy)
+      recruiterId: req.recruiter.id,
+      companyId: req.recruiter.companyId
+
     });
     // 4. save
     await newInternship.save();
@@ -131,7 +131,6 @@ export const getInternshipById = async (req, res) => {
     });
   }
 };
-
 
 //update internship
 export const updateInternship = async (req, res) => {
