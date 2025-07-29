@@ -1,7 +1,7 @@
 import bcrypt from "bcrypt";
 import dotenv from "dotenv";
 import User from "../../models/userModel/userModel.js";
-import Application from '../../models/applicationModel/applicationModel.js'
+import Application from "../../models/applicationModel/applicationModel.js";
 import { sendOtp, verifyOtp } from "../../services/emailServices/sendOtp.js";
 import { sendMail } from "../../services/emailServices/sendMail.js";
 import {
@@ -370,4 +370,3 @@ export const logoutUser = (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
-
