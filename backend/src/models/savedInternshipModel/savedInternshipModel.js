@@ -21,4 +21,5 @@ const savedInternshipSchema = new mongoose.Schema(
   }
 );
 
-export default mongoose.model("SavedInternship", savedInternshipSchema);
+const SavedInternship = mongoose.model("SavedInternship", savedInternshipSchema);
+export default SavedInternship
