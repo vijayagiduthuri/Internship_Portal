@@ -6,6 +6,7 @@ import {
   getInternshipById,
   deleteInternship,
   getApplicationsByInternshipId,
+  saveInternship,
 } from "../../controllers/internshipController/internshipControllers.js";
 import { applyInternship } from "../../controllers/internshipApplicationController/internshipApplicationControllers.js";
 import { protectRoute } from "../../middlewares/jwtToken.js";
@@ -20,7 +21,7 @@ router.post("/create-internship", checkRecruiter, createInternship);
 
 router.post("/apply-internship", protectRoute, applyInternship);
 
-router.get("/get-all-internships", getAllInternships);
+router.get("/get-all-internships", protectRoute, getAllInternships);
 
 router.get("/get-internship-id/:id", getInternshipById);
 
@@ -44,5 +45,7 @@ router.delete(
   checkRecuiterOrganisation,
   deleteInternship
 );
+
+router.post("/save-internship",protectRoute,saveInternship)
 
 export default router;

@@ -2,6 +2,7 @@ import crypto from "crypto";
 import Internship from "../../models/internshipModel/internshipModel.js";
 import Application from "../../models/applicationModel/applicationModel.js";
 import mongoose from "mongoose";
+import SavedInternship from "../../models/savedInternshipModel/savedInternshipModel.js";
 import { generateInternshipHash } from "../../services/internshipServices/generateInternshipHash.js";
 
 // Create Internship
@@ -21,7 +22,7 @@ export const createInternship = async (req, res) => {
     !payload.description ||
     !payload.responsibilities ||
     !Array.isArray(payload.responsibilities) ||
-    payload.responsibilities.length === 0 
+    payload.responsibilities.length === 0
   ) {
     return res.status(400).json({
       success: false,
@@ -39,16 +40,15 @@ export const createInternship = async (req, res) => {
     if (duplicate) {
       return res.status(409).json({
         success: false,
-        message: "Duplicate internship post. A similar listing already exists."
+        message: "Duplicate internship post. A similar listing already exists.",
       });
     }
     // 3. build new internship doc
     const newInternship = new Internship({
       ...payload,
-      uid: postHash,          // quick unique uid;
+      uid: postHash, // quick unique uid;
       recruiterId: req.recruiter.id,
-      companyId: req.recruiter.companyId
-
+      companyId: req.recruiter.companyId,
     });
     // 4. save
     await newInternship.save();
@@ -69,12 +69,30 @@ export const createInternship = async (req, res) => {
 };
 
 // Get All internships
+// export const getAllInternships = async (req, res) => {
+//   try {
+//     const internships = await Internship.find().sort({ createdAt: -1 });
+//     res.status(200).json(internships);
+//   } catch (error) {
+//     res.status(500).json({ message: "Failed to fetch internships", error });
+//   }
+// };
 export const getAllInternships = async (req, res) => {
+  const userId = req.user.id;
   try {
-    const internships = await Internship.find().sort({ createdAt: -1 });
-    res.status(200).json(internships);
-  } catch (error) {
-    res.status(500).json({ message: "Failed to fetch internships", error });
+    const internships = await Internship.find({ isActive: true }).lean(); // `.lean()` to make modifiable
+
+    const saved = await SavedInternship.findOne({ userId });
+    const savedIds = saved ? saved.internships.map(id => id.toString()) : [];
+
+    const response = internships.map(internship => ({
+      ...internship,
+      savedByUser: savedIds.includes(internship._id.toString())
+    }));
+
+    res.status(200).json(response);
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to fetch internships', error: err });
   }
 };
 
@@ -184,7 +202,9 @@ export const getApplicationsByInternshipId = async (req, res) => {
     const applications = await Application.find({ internshipId });
 
     if (applications.length === 0) {
-      return res.status(404).json({ message: "No applications found for this internship" });
+      return res
+        .status(404)
+        .json({ message: "No applications found for this internship" });
     }
 
     res.status(200).json({
@@ -195,5 +215,30 @@ export const getApplicationsByInternshipId = async (req, res) => {
   } catch (error) {
     console.error("Error fetching applications:", error);
     res.status(500).json({ message: "Server Error", error: error.message });
+  }
+};
+
+export const saveInternship = async (req, res) => {
+  const { internshipId } = req.body;
+  const userId = req.user._id;
+  try {
+    let saved = await SavedInternship.findOne({ userId });
+    if (!saved) {
+      saved = await SavedInternship.create({
+        userId,
+        internships: [internshipId],
+      });
+    } else {
+      if (!saved.internships.includes(internshipId)) {
+        saved.internships.push(internshipId);
+        await saved.save();
+      }
+    }
+
+    return res.status(200).json({ message: "Internship saved successfully" });
+  } catch (err) {
+    return res
+      .status(500)
+      .json({ message: "Something went wrong", error: err });
   }
 };
