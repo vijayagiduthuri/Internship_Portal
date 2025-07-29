@@ -15,5 +15,6 @@ router.post("/verify", verifyCompany);
 
 router.post("/generate", generateCompanyAdminCredential);
 
-router.post("/update-company/:id",updateCompany )
+router.post("/update-company/:id", updateCompany);
+
 export default router;

@@ -7,6 +7,7 @@ export const generateOtpToken = (email) => {
     return token;
 }
 
+//verify otp token
 export const verifyOtpToken = async (email, token) => {
   try {
     // 1. Verify token
