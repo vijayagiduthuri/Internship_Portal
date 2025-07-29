@@ -95,7 +95,7 @@ const UserProfile = () => {
   ];
 
   const ProfileSection = ({ title, icon: Icon, children }) => (
-    <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+    <div className="bg-white rounded-lg p-6 mb-6" style={{ boxShadow: '0 10px 25px rgba(139, 69, 19, 0.15), 0 4px 12px rgba(139, 69, 19, 0.1)' }}>
       <div className="flex items-center mb-4">
         <Icon className="text-purple-600 mr-2" size={20} />
         <h2 className="text-xl font-semibold text-gray-800">{title}</h2>
@@ -128,30 +128,33 @@ const UserProfile = () => {
   );
 
   return (
-    <div className="min-h-screen" style={{ background: 'linear-gradient(135deg, #620080 0%, #5a007a 25%, #4b0066 75%, #3d0052 100%)' }}>
+    <div className="min-h-screen" style={{ backgroundColor: '#ffffff' }}>
       <div className="flex">
         {/* Side Panel */}
-        <div className="w-64 bg-white shadow-lg fixed h-full overflow-y-auto">
+        <div className="w-64 fixed h-full overflow-y-auto" style={{ 
+          background: 'linear-gradient(135deg, #620080 0%, #5a007a 25%, #4b0066 75%, #3d0052 100%)',
+          boxShadow: '4px 0 15px rgba(139, 69, 19, 0.2)'
+        }}>
           {/* User Info Section */}
-          <div className="p-6 border-b border-gray-200">
+          <div className="p-6 border-b border-purple-400">
             <div className="flex flex-col items-center text-center">
-              <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mb-3">
+              <div className="w-16 h-16 bg-purple-200 rounded-full flex items-center justify-center mb-3" style={{ boxShadow: '0 4px 12px rgba(139, 69, 19, 0.15)' }}>
                 {profile.personalInfo.profileImage ? (
                   <img src={profile.personalInfo.profileImage} alt="Profile" className="w-16 h-16 rounded-full object-cover" />
                 ) : (
-                  <User size={24} className="text-purple-600" />
+                  <User size={24} className="text-purple-800" />
                 )}
               </div>
-              <h3 className="font-semibold text-gray-800 text-sm">
+              <h3 className="font-semibold text-white text-sm">
                 {profile.personalInfo.firstName || profile.personalInfo.lastName 
                   ? `${profile.personalInfo.firstName} ${profile.personalInfo.lastName}`.trim()
                   : 'Your Name'}
               </h3>
-              <p className="text-purple-600 text-xs mt-1">
+              <p className="text-purple-200 text-xs mt-1">
                 {profile.preferences.desiredRole || 'Your Role'}
               </p>
               {profile.personalInfo.location && (
-                <div className="flex items-center text-gray-500 text-xs mt-2">
+                <div className="flex items-center text-purple-200 text-xs mt-2">
                   <MapPin size={12} className="mr-1" />
                   <span>{profile.personalInfo.location}</span>
                 </div>
@@ -166,7 +169,8 @@ const UserProfile = () => {
                 <button
                   key={item.id}
                   onClick={() => scrollToSection(item.id)}
-                  className="w-full flex items-center px-3 py-2 text-left text-gray-700 hover:bg-purple-50 hover:text-purple-600 rounded-lg transition-colors text-sm"
+                  className="w-full flex items-center px-3 py-2 text-left text-white hover:bg-purple-700 hover:text-purple-100 rounded-lg transition-colors text-sm"
+                  style={{ boxShadow: 'inset 0 2px 4px rgba(139, 69, 19, 0.1)' }}
                 >
                   <item.icon size={16} className="mr-3" />
                   {item.name}
@@ -176,10 +180,11 @@ const UserProfile = () => {
           </div>
 
           {/* Edit Button in Sidebar */}
-          <div className="p-4 border-t border-gray-200 mt-auto">
+          <div className="p-4 border-t border-purple-400 mt-auto">
             <button
               onClick={() => setIsEditing(!isEditing)}
-              className="w-full bg-purple-900 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors flex items-center justify-center text-sm"
+              className="w-full bg-purple-200 text-purple-900 px-4 py-2 rounded-lg hover:bg-purple-100 transition-colors flex items-center justify-center text-sm font-medium"
+              style={{ boxShadow: '0 6px 16px rgba(139, 69, 19, 0.15)' }}
             >
               <Edit3 size={14} className="mr-2" />  
               {isEditing ? 'Save Profile' : 'Edit Profile'}
@@ -191,19 +196,22 @@ const UserProfile = () => {
         <div className="flex-1 ml-64 p-6">
           <div className="max-w-4xl mx-auto">
             {/* Header */}
-            <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+            <div className="rounded-lg p-6 mb-6" style={{ 
+              background: 'linear-gradient(135deg, #620080 0%, #5a007a 25%, #4b0066 75%, #3d0052 100%)',
+              boxShadow: '0 12px 32px rgba(139, 69, 19, 0.2), 0 6px 16px rgba(139, 69, 19, 0.1)'
+            }}>
               <div className="flex justify-between items-center">
                 <div>
-                  <h1 className="text-3xl font-bold text-gray-800">Profile Dashboard</h1>
-                  <p className="text-gray-600 mt-1">Manage your internship profile information</p>
+                  <h1 className="text-3xl font-bold text-white">Profile Dashboard</h1>
+                  <p className="text-purple-200 mt-1">Manage your internship profile information</p>
                 </div>
-                <div className="text-sm text-gray-500">
+                <div className="text-sm">
                   {isEditing ? (
-                    <span className="bg-orange-100 text-orange-600 px-3 py-1 rounded-full">
+                    <span className="bg-orange-200 text-orange-800 px-3 py-1 rounded-full" style={{ boxShadow: '0 4px 12px rgba(139, 69, 19, 0.15)' }}>
                       Editing Mode
                     </span>
                   ) : (
-                    <span className="bg-green-100 text-green-600 px-3 py-1 rounded-full">
+                    <span className="bg-green-200 text-green-800 px-3 py-1 rounded-full" style={{ boxShadow: '0 4px 12px rgba(139, 69, 19, 0.15)' }}>
                        View Mode
                     </span>
                   )}
@@ -493,6 +501,7 @@ const UserProfile = () => {
                       <span
                         key={index}
                         className="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm flex items-center"
+                        style={{ boxShadow: '0 4px 12px rgba(139, 69, 19, 0.1)' }}
                       >
                         {skill}
                         {isEditing && (
@@ -513,6 +522,7 @@ const UserProfile = () => {
                       type="text"
                       placeholder="Add a skill and press Enter"
                       className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      style={{ boxShadow: '0 4px 12px rgba(139, 69, 19, 0.1)' }}
                       onKeyPress={(e) => {
                         if (e.key === 'Enter') {
                           addSkill(e.target.value);

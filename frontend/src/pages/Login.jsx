@@ -1,6 +1,5 @@
 import { useState } from 'react';
 
-// Mock toast functions since react-toastify isn't available
 const toast = {
   success: (message) => {
     const toastEl = document.createElement('div');
@@ -145,13 +144,12 @@ export default function Login() {
   };
 
   const handleForgotPassword = () => {
-    if (!formData.email) {
-      toast.error('Please enter your email first to reset password!');
-      return;
-    }
-    toast.success('📧 Password reset link sent to your email!');
-  };
+  window.location.href = '/forgot-password';
+};
 
+const handleSignUp = () => {
+  window.location.href = '/signup';
+};
   return (
     <div className="min-h-screen flex relative overflow-hidden">
       {/* Left Panel - Form */}
@@ -224,7 +222,7 @@ export default function Login() {
                 type="button"
                 onClick={handleForgotPassword}
                 disabled={loading}
-                className="text-purple-600 text-sm hover:text-purple-800 transition-colors duration-200 disabled:opacity-50"
+                className="text-purple-600 text-sm hover:text-purple-800 transition-colors duration-200 disabled:opacity-50 hover:underline"
               >
                 Forgot Password?
               </button>
@@ -288,11 +286,16 @@ export default function Login() {
           </div>
 
           <div className="mt-5 text-center">
-            <span className="text-gray-500 text-sm">Don't have an account? </span>
-            <a href="#" className="text-purple-600 text-sm hover:text-purple-800 transition-colors duration-200">
-              Sign up
-            </a>
-          </div>
+  <span className="text-gray-500 text-sm">Don't have an account? </span>
+  <button 
+    type="button"
+    onClick={handleSignUp}
+    disabled={loading}
+    className="text-purple-600 text-sm hover:text-purple-800 transition-colors duration-200 disabled:opacity-50 hover:underline bg-transparent border-none cursor-pointer"
+  >
+    Sign up
+  </button>
+</div>
         </div>
       </div>
 
