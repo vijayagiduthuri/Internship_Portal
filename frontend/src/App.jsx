@@ -4,7 +4,8 @@ import Signup from './pages//Signup'
 import Login from './pages/Login'
 import CompanyRegistration from './pages/CompanyRegistrartion'
 import UserProfile from './pages/UserProfile'
-
+import UserDashboard from './pages/UserDashboard'
+import ForgotPassword from './pages/ForgotPassword'
 
 
 function App() {
@@ -14,7 +15,9 @@ function App() {
       <Route path='/signup' element={<Signup/>}/>
       <Route path="/login" element={<Login />} />
       <Route path="/company-registration" element={<CompanyRegistration/>}/>
-      <Route path="user-profile" element={<UserProfile/>}/>
+      <Route path="/user-profile" element={<UserProfile/>}/>
+      <Route path="/user-dashboard" element={<UserDashboard/>}/>
+      <Route path="/forgot-password" element={<ForgotPassword />} />
     </Routes>
     
   )

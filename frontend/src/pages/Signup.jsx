@@ -129,9 +129,10 @@ const Signup = () => {
 
     setLoading(true);
     toast.success("Registration successful!");
-    setTimeout(() => navigate("/signin"), 1300);
+    setTimeout(() => navigate("/login"), 1300);
     setLoading(false);
   };
+
 
   const handleOtpInput = (e, idx) => {
     const v = e.target.value.replace(/[^0-9]/g, "");
@@ -373,7 +374,7 @@ const Signup = () => {
 
           <div className="mt-5 text-center">
             <span className="text-gray-500 text-sm">Already have an account? </span>
-            <a href="/signin" className="text-purple-600 text-sm hover:text-purple-800 transition-colors duration-200">
+            <a href="/login" className="text-purple-600 text-sm hover:text-purple-800 transition-colors duration-200">
               Sign in
             </a>
           </div>
