@@ -221,24 +221,33 @@ export const getApplicationsByInternshipId = async (req, res) => {
 export const saveInternship = async (req, res) => {
   const { internshipId } = req.body;
   const userId = req.user._id;
+
   try {
     let saved = await SavedInternship.findOne({ userId });
+
     if (!saved) {
       saved = await SavedInternship.create({
         userId,
         internships: [internshipId],
       });
+      return res.status(201).json({ message: 'Internship saved' });
     } else {
-      if (!saved.internships.includes(internshipId)) {
+      const index = saved.internships.indexOf(internshipId);
+
+      if (index === -1) {
+        // Save the internship
         saved.internships.push(internshipId);
         await saved.save();
+        return res.status(200).json({ message: 'Internship saved' });
+      } else {
+        // Unsave the internship
+        saved.internships.splice(index, 1);
+        await saved.save();
+        return res.status(200).json({ message: 'Internship unsaved' });
       }
     }
-
-    return res.status(200).json({ message: "Internship saved successfully" });
-  } catch (err) {
-    return res
-      .status(500)
-      .json({ message: "Something went wrong", error: err });
+  } catch (error) {
+    console.error('Error in saving/unsaving internship:', error);
+    return res.status(500).json({ message: 'Server error' });
   }
 };
