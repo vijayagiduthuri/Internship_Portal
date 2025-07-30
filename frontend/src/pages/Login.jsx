@@ -1,82 +1,27 @@
-import { useState } from 'react';
-
-const toast = {
-  success: (message) => {
-    const toastEl = document.createElement('div');
-    toastEl.innerHTML = `
-      <div style="
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background: white;
-        color: #333;
-        padding: 12px 20px;
-        border-radius: 12px;
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-        z-index: 9999;
-        border-bottom: 4px solid #620080;
-        animation: slideIn 0.3s ease-out;
-        min-width: 280px;
-      ">
-        ${message}
-      </div>
-    `;
-    document.body.appendChild(toastEl);
-    setTimeout(() => {
-      toastEl.style.animation = 'slideOut 0.3s ease-in';
-      setTimeout(() => document.body.removeChild(toastEl), 300);
-    }, 4000);
-  },
-  error: (message) => {
-    const toastEl = document.createElement('div');
-    toastEl.innerHTML = `
-      <div style="
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background: white;
-        color: #333;
-        padding: 12px 20px;
-        border-radius: 12px;
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-        z-index: 9999;
-        border-bottom: 4px solid #dc2626;
-        animation: slideIn 0.3s ease-out;
-        min-width: 280px;
-      ">
-        ${message}
-      </div>
-    `;
-    document.body.appendChild(toastEl);
-    setTimeout(() => {
-      toastEl.style.animation = 'slideOut 0.3s ease-in';
-      setTimeout(() => document.body.removeChild(toastEl), 300);
-    }, 4000);
-  }
-};
+import { useRef, useState } from 'react';
+import {useNavigate} from 'react-router-dom';
+import toast from '../components/Toast';
+import { useAuthstore } from '../store/useAuthstore';
 
 export default function Login() {
+  const {handleLogin ,triggerShake} = useAuthstore();
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
     password: ''
   });
-
+  const passwordInputRef = useRef(null);
   const handleInputChange = (e) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value
     });
   };
-
+const   isGmail =  (val) => /^[a-zA-Z0-9._%+-]+@gmail\.com$/.test(val);
   const validateForm = () => {
     if (!formData.email) {
       toast.error('Email is required!');
-      return false;
-    }
-    if (!formData.email.includes('@')) {
-      toast.error('Please enter a valid email address!');
       return false;
     }
     if (!formData.password) {
@@ -89,31 +34,11 @@ export default function Login() {
     }
     return true;
   };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    if (!validateForm()) return;
-
-    setLoading(true);
-    
-    try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // Simulate login logic - replace with actual authentication
-      if (formData.email === 'admin@example.com' && formData.password === 'password123') {
-        toast.success('Login successful!');
-        console.log('Login submitted:', formData);
-      } else {
-        toast.error('Incorrect email or password. Please try again.');
-      }
-    } catch (error) {
-      toast.error('Login failed. Please try again later.');
-    } finally {
-      setLoading(false);
-    }
-  };
+const handleSubmit = () => {
+  if (validateForm()) {
+    handleLogin(formData);
+  }
+};
 
   const handleGoogleLogin = async () => {
     setLoading(true);
@@ -172,8 +97,18 @@ const handleSignUp = () => {
                   value={formData.email}
                   onChange={handleInputChange}
                   disabled={loading}
-                  onKeyDown={(e) => e.key === 'Enter' && handleSubmit(e)}
-                  className="w-full pl-10 sm:pl-12 pr-4 py-2.5 bg-gray-50 border border-gray-300 rounded-lg text-black placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                  onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                              e.preventDefault();
+                              if(isGmail(formData.email))            // Prevent form submit
+                              passwordInputRef.current?.focus(); // Move focus to password
+                              else{
+                                toast.error("Please enter a valid Gmail address!");
+                                triggerShake("emailError");
+                              } 
+                            }
+                          }}                  
+              className="w-full pl-10 sm:pl-12 pr-4 py-2.5 bg-gray-50 border border-gray-300 rounded-lg text-black placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                   placeholder="Enter your email"
                 />
               </div>
@@ -188,12 +123,13 @@ const handleSignUp = () => {
                   </svg>
                 </div>
                 <input
+                  ref={passwordInputRef}        // Attach ref here
                   type={showPassword ? 'text' : 'password'}
                   name="password"
                   value={formData.password}
                   onChange={handleInputChange}
                   disabled={loading}
-                  onKeyDown={(e) => e.key === 'Enter' && handleSubmit(e)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
                   className="w-full pl-10 sm:pl-12 pr-12 py-2.5 bg-gray-50 border border-gray-300 rounded-lg text-black placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                   placeholder="Enter your password"
                 />
@@ -231,7 +167,7 @@ const handleSignUp = () => {
             <div className="flex justify-center">
               <button 
                 type="button"
-                onClick={handleSubmit}
+                onClick={()=>handleLogin(formData)}
                 disabled={loading}
                 className="w-full cursor-pointer text-white font-bold shadow-md hover:scale-[1.02] sm:hover:scale-[1.05] shadow-purple-800 py-2.5 bg-gradient-to-bl from-purple-900 to-purple-900 rounded-md transition-transform duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center"
               >
@@ -286,16 +222,11 @@ const handleSignUp = () => {
           </div>
 
           <div className="mt-5 text-center">
-  <span className="text-gray-500 text-sm">Don't have an account? </span>
-  <button 
-    type="button"
-    onClick={handleSignUp}
-    disabled={loading}
-    className="text-purple-600 text-sm hover:text-purple-800 transition-colors duration-200 disabled:opacity-50 hover:underline bg-transparent border-none cursor-pointer"
-  >
-    Sign up
-  </button>
-</div>
+            <span className="text-gray-500 text-sm">Don't have an account? </span>
+            <a href="/signup" className="text-purple-600 text-sm hover:text-purple-800 transition-colors duration-200">
+              Sign up
+            </a>
+          </div>
         </div>
       </div>
 
@@ -357,7 +288,7 @@ const handleSignUp = () => {
       </div>
 
       {/* Custom CSS Animations + Toast Styles */}
-      <style jsx>{`
+      <style>{`
         @keyframes fadeInUp {
           from {
             opacity: 0;

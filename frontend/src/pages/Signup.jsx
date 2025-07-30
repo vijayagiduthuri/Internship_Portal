@@ -1,139 +1,29 @@
-import React, { useState, useRef, useEffect } from "react";
-
-// Mock toast functions for better styling
-const toast = {
-  success: (message) => {
-    const toastEl = document.createElement('div');
-    toastEl.innerHTML = `
-      <div style="
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background: white;
-        color: #333;
-        padding: 12px 20px;
-        border-radius: 12px;
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-        z-index: 9999;
-        border-bottom: 4px solid #620080;
-        animation: slideIn 0.3s ease-out;
-        min-width: 280px;
-      ">
-        ${message}
-      </div>
-    `;
-    document.body.appendChild(toastEl);
-    setTimeout(() => {
-      toastEl.style.animation = 'slideOut 0.3s ease-in';
-      setTimeout(() => document.body.removeChild(toastEl), 300);
-    }, 3500);
-  },
-  error: (message) => {
-    const toastEl = document.createElement('div');
-    toastEl.innerHTML = `
-      <div style="
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background: white;
-        color: #333;
-        padding: 12px 20px;
-        border-radius: 12px;
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-        z-index: 9999;
-        border-bottom: 4px solid #dc2626;
-        animation: slideIn 0.3s ease-out;
-        min-width: 280px;
-      ">
-        ${message}
-      </div>
-    `;
-    document.body.appendChild(toastEl);
-    setTimeout(() => {
-      toastEl.style.animation = 'slideOut 0.3s ease-in';
-      setTimeout(() => document.body.removeChild(toastEl), 300);
-    }, 3500);
-  }
-};
+import React, {useRef, useEffect } from "react";
+import { useAuthstore } from "../store/useAuthstore";
+import toast from "../components/Toast";
 
 const Signup = () => {
-  const navigate = (path) => {
-    console.log(`Navigate to: ${path}`);
-  };
-  const BASE_URL = "http://127.0.0.1:9000/api/authUsers/register";
+  const {
+    phase,
+    loading,
+    email,
+    otp,
+    userName,
+    password,
+    emailError,
+    otpError,
+    credentialsError,
 
-  const [phase, setPhase] = useState("email");
-  const [loading, setLoading] = useState(false);
-  const [emailError, setEmailError] = useState(false);
-  const [otpError, setOtpError] = useState(false);
-  const [credentialsError, setCredentialsError] = useState({ userName: false, password: false });
-
-  const [email, setEmail] = useState("");
-  const [otp, setOtp] = useState(["", "", "", "", "", ""]);
-  const [userName, setUserName] = useState("");
-  const [password, setPassword] = useState("");
-  const [verifyToken, setVerifyToken] = useState("");
+    setEmail,
+    setOtp,
+    setUserName,
+    setPassword,
+    handleEmailPhase,
+    handleOtpPhase,
+    handleSignupPhase,
+  } = useAuthstore();
 
   const otpInputs = useRef([...Array(6)].map(() => React.createRef()));
-
-  const isGmail = (val) => /^[a-zA-Z0-9._%+-]+@gmail\.com$/.test(val);
-
-  const triggerShake = (setFunc) => {
-    setFunc(true);
-    setTimeout(() => setFunc(false), 700);
-  };
-
-  const handleEmailPhase = async () => {
-    if (!isGmail(email.trim())) {
-      triggerShake(setEmailError);
-      toast.error("Please enter a valid Gmail address!");
-      return;
-    }
-    setLoading(true);
-    toast.success("OTP sent! Check your Gmail.");
-    setPhase("otp");
-    setLoading(false);
-  };
-
-  const handleOtpPhase = async (enteredOtp) => {
-    setLoading(true);
-    const otpStr = (enteredOtp || otp).join("");
-    if (otpStr.length === 6) {
-      setVerifyToken("sample-token");
-      toast.success("OTP verified!");
-      setPhase("credentials");
-    } else {
-      setOtp(["", "", "", "", "", ""]);
-      triggerShake(setOtpError);
-      toast.error("Invalid OTP! Please try again.");
-    }
-    setLoading(false);
-  };
-
-  const handleSignupPhase = async () => {
-    const errors = {};
-    let hasErr = false;
-    if (!userName) { 
-      errors.userName = true; 
-      hasErr = true;
-      toast.error("Username is required!");
-    }
-    if (!password || password.length < 6) { 
-      errors.password = true; 
-      hasErr = true;
-      toast.error("Password must be at least 6 characters long!");
-    }
-    setCredentialsError(errors);
-
-    if (hasErr) return;
-
-    setLoading(true);
-    toast.success("Registration successful!");
-    setTimeout(() => navigate("/login"), 1300);
-    setLoading(false);
-  };
-
-
   const handleOtpInput = (e, idx) => {
     const v = e.target.value.replace(/[^0-9]/g, "");
     if (!v) {
@@ -152,7 +42,7 @@ const Signup = () => {
     if (idx < 5 && v) otpInputs.current[idx + 1].current.focus();
 
     if (idx === 5 && updated.every(b => b)) {
-      setTimeout(() => handleOtpPhase(updated), 100);
+      setTimeout(() => handleOtpPhase(updated,toast), 100);
     }
   };
 
@@ -178,30 +68,23 @@ const Signup = () => {
     }
   };
 
-  useEffect(() => setEmailError(false), [email]);
-  useEffect(() => setOtpError(false), [otp.join("")]);
-  useEffect(() => setCredentialsError({userName:false, password:false}), [userName, password]);
-
   useEffect(() => {
     function handleEnter(e) {
       if (loading) return;
       if (e.key === "Enter") {
-        if (phase==="email") handleEmailPhase();
-        if (phase==="credentials") handleSignupPhase();
+        if (phase==="email") handleEmailPhase(toast);
+        if (phase==="credentials") handleSignupPhase(toast);
       }
     }
     window.addEventListener("keydown", handleEnter);
     return () => window.removeEventListener("keydown", handleEnter);
-  }, [phase, email, userName, password, otp, loading]);
+  }, [phase, email, userName, password, otp, loading, handleEmailPhase, handleSignupPhase, toast]);
 
   return (
     <div className="min-h-screen flex flex-col lg:flex-row relative">
       {/* Left Panel - Welcome Section with Smooth Single Curved Right Edge */}
-      
       <div 
         className="w-full lg:w-3/5 flex flex-col justify-center items-center p-4 sm:p-6 lg:p-8 relative overflow-hidden min-h-[300px] sm:min-h-[400px] lg:min-h-screen order-1 lg:order-1" 
-        
-
         style={{ 
           backgroundColor: '#620080',
           clipPath: 'ellipse(100% 160% at 0% 50%)'
@@ -281,7 +164,7 @@ const Signup = () => {
                 <div className="flex justify-center">
                   <button
                     className="w-full cursor-pointer text-white font-bold shadow-md hover:scale-[1.02] sm:hover:scale-[1.05] shadow-purple-800 py-2.5 bg-gradient-to-bl from-purple-900 to-purple-900 rounded-md transition-transform duration-200 disabled:opacity-50"
-                    onClick={handleEmailPhase}
+                    onClick={()=>handleEmailPhase(toast)}
                     disabled={loading}
                   >
                     {loading ? "Sending OTP..." : "Get OTP"}
@@ -362,7 +245,7 @@ const Signup = () => {
                 <div className="flex justify-center">
                   <button
                     className="w-full cursor-pointer text-white font-bold shadow-md hover:scale-[1.02] sm:hover:scale-[1.05] shadow-purple-800 py-2.5 bg-gradient-to-bl from-purple-900 to-purple-900 rounded-md transition-transform duration-200 disabled:opacity-50"
-                    onClick={handleSignupPhase}
+                    onClick={()=>handleSignupPhase(toast)}
                     disabled={loading || !userName || !password}
                   >
                     {loading ? "Signing up..." : "Sign Up"}
