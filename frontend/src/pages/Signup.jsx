@@ -72,8 +72,8 @@ const Signup = () => {
     function handleEnter(e) {
       if (loading) return;
       if (e.key === "Enter") {
-        if (phase==="email") handleEmailPhase();
-        if (phase==="credentials") handleSignupPhase();
+        if (phase==="email") handleEmailPhase(toast);
+        if (phase==="credentials") handleSignupPhase(toast);
       }
     }
     window.addEventListener("keydown", handleEnter);

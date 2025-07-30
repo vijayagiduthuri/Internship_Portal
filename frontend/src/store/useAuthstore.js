@@ -26,7 +26,7 @@ export const useAuthstore = create((set, get) => ({
   },
 
  handleEmailPhase: async (toast) => {
-  const { email, isGmail, triggerShake,} = get();
+  const { email, isGmail, triggerShake} = get();
 
   if (!isGmail(email.trim())) {
     toast.error("Enter a valid email address");
@@ -133,23 +133,27 @@ export const useAuthstore = create((set, get) => ({
   },
 
   isGmail: (val) => /^[a-zA-Z0-9._%+-]+@gmail\.com$/.test(val),
-  handlLogin : ()=>{
-  },
   //login page authentication
-  handleLogin :async (formData)=>
-  {
-    try {
-      const res = await axiosInstance.post('/api/authUsers/login', formData);
-      if(res.status===400 || res.status===401 ) toast.error(res.data.message);
-      else if (res.status === 200 && res.data.success) {
-        toast.success(res.data.message || "Login successful!");
-        setTimeout(() => navigate("/"), 1300);
-      } else {
-        toast.error(res.data.message || "Login failed.");
-      }
+handleLogin: async (formData) => {
+  try {
+    const res = await axiosInstance.post('/api/authUsers/login', formData);
+    if (res.data.success) {
+      toast.success(res.data.message || "Login successful!");
+      localStorage.setItem("user", JSON.stringify(res.data.user));
+      set({ user: res.data.user });
+      setTimeout(() => navigate("/"), 1300);
+    } else {
+      toast.error(res.data.message || "Login failed.");
     }
-    catch(err){
-        toast.error(err.response?.data?.message || "Server error.");
-      }
+  } catch (err) {
+    const status = err.response?.status;
+    const message = err.response?.data?.message || "Server error.";
+    if (status === 401) {
+      toast.error(message|| "Unauthorized access.");
+    } else {
+      toast.error(message);
+    }  
   }
+}
+
 }));

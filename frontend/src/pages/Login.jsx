@@ -4,7 +4,7 @@ import toast from '../components/Toast';
 import { useAuthstore } from '../store/useAuthstore';
 
 export default function Login() {
-  const {handleLogin } = useAuthstore();
+  const {handleLogin ,triggerShake} = useAuthstore();
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -18,14 +18,10 @@ export default function Login() {
       [e.target.name]: e.target.value
     });
   };
-
+const   isGmail =  (val) => /^[a-zA-Z0-9._%+-]+@gmail\.com$/.test(val);
   const validateForm = () => {
     if (!formData.email) {
       toast.error('Email is required!');
-      return false;
-    }
-    if (!formData.email.includes('@')) {
-      toast.error('Please enter a valid email address!');
       return false;
     }
     if (!formData.password) {
@@ -36,9 +32,13 @@ export default function Login() {
       toast.error('Password must be at least 6 characters long!');
       return false;
     }
-    handleLogin(formData);
     return true;
   };
+const handleSubmit = () => {
+  if (validateForm()) {
+    handleLogin(formData);
+  }
+};
 
   const handleGoogleLogin = async () => {
     setLoading(true);
@@ -100,8 +100,13 @@ export default function Login() {
                   disabled={loading}
                   onKeyDown={(e) => {
                             if (e.key === 'Enter') {
-                              e.preventDefault();            // Prevent form submit
-                              passwordInputRef.current?.focus();  // Move focus to password
+                              e.preventDefault();
+                              if(isGmail(formData.email))            // Prevent form submit
+                              passwordInputRef.current?.focus(); // Move focus to password
+                              else{
+                                toast.error("Please enter a valid Gmail address!");
+                                triggerShake("emailError");
+                              } 
                             }
                           }}                  
               className="w-full pl-10 sm:pl-12 pr-4 py-2.5 bg-gray-50 border border-gray-300 rounded-lg text-black placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -125,7 +130,7 @@ export default function Login() {
                   value={formData.password}
                   onChange={handleInputChange}
                   disabled={loading}
-                  onKeyDown={(e) => e.key === 'Enter' && validateForm()}
+                  onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
                   className="w-full pl-10 sm:pl-12 pr-12 py-2.5 bg-gray-50 border border-gray-300 rounded-lg text-black placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                   placeholder="Enter your password"
                 />
@@ -163,7 +168,7 @@ export default function Login() {
             <div className="flex justify-center">
               <button 
                 type="button"
-                onClick={handleLogin}
+                onClick={()=>handleLogin(formData)}
                 disabled={loading}
                 className="w-full cursor-pointer text-white font-bold shadow-md hover:scale-[1.02] sm:hover:scale-[1.05] shadow-purple-800 py-2.5 bg-gradient-to-bl from-purple-900 to-purple-900 rounded-md transition-transform duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center"
               >
@@ -219,7 +224,7 @@ export default function Login() {
 
           <div className="mt-5 text-center">
             <span className="text-gray-500 text-sm">Don't have an account? </span>
-            <a href="#" className="text-purple-600 text-sm hover:text-purple-800 transition-colors duration-200">
+            <a href="/signup" className="text-purple-600 text-sm hover:text-purple-800 transition-colors duration-200">
               Sign up
             </a>
           </div>
