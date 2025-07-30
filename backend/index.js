@@ -6,7 +6,7 @@ import userRoutes from "./src/routes/authUserRoutes/userRoutes.js";
 import authCompanyRoutes from "./src/routes/authCompanyRoutes/authCompanyRoutes.js";
 import internshipRoutes from "./src/routes/internshipRoutes/internshipRoutes.js";
 import profileRoutes from "./src/routes/profileRoutes/profileRoutes.js";
-import recruiterRoutes from "./src/routes/authRecruiterRoutes/authRecruiterRoutes.js"
+import recruiterRoutes from "./src/routes/authRecruiterRoutes/authRecruiterRoutes.js";
 import { connectDB } from "./src/lib/db.js";
 
 // Load environment variables

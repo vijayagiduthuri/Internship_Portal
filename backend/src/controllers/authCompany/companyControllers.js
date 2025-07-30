@@ -5,6 +5,7 @@ import { sendMail } from "../../services/emailServices/sendMail.js";
 import bcrypt from "bcrypt";
 import crypto from "crypto";
 
+//Function to register a company 
 export const registerCompany = async (req, res) => {
   try {
     const companyData = req.body;
@@ -90,6 +91,8 @@ export const registerCompany = async (req, res) => {
     });
   }
 };
+
+//Function to verify company
 export const verifyCompany = async (req, res) => {
   const { email } = req.body;
   const lowerEmail = email.toLowerCase().trim();
@@ -134,6 +137,8 @@ export const verifyCompany = async (req, res) => {
     });
   }
 };
+
+//Function to generate admin credientials
 export const generateCompanyAdminCredential = async (req, res) => {
   const { email } = req.body;
   const lowerEmail = email.toLowerCase().trim();
@@ -232,6 +237,8 @@ export const generateCompanyAdminCredential = async (req, res) => {
     });
   }
 };
+
+//Function to update Comapny
 export const updateCompany = async (req, res) => {
   try {
     const { id } = req.params; // MongoDB ObjectId

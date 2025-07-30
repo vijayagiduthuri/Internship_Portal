@@ -69,13 +69,12 @@ const handleSubmit = () => {
   };
 
   const handleForgotPassword = () => {
-    if (!formData.email) {
-      toast.error('Please enter your email first to reset password!');
-      return;
-    }
-    toast.success('📧 Password reset link sent to your email!');
-  };
+  window.location.href = '/forgot-password';
+};
 
+const handleSignUp = () => {
+  window.location.href = '/signup';
+};
   return (
     <div className="min-h-screen flex relative overflow-hidden">
       {/* Left Panel - Form */}
@@ -159,7 +158,7 @@ const handleSubmit = () => {
                 type="button"
                 onClick={handleForgotPassword}
                 disabled={loading}
-                className="text-purple-600 text-sm hover:text-purple-800 transition-colors duration-200 disabled:opacity-50"
+                className="text-purple-600 text-sm hover:text-purple-800 transition-colors duration-200 disabled:opacity-50 hover:underline"
               >
                 Forgot Password?
               </button>
