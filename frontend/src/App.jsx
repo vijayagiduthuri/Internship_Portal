@@ -20,7 +20,6 @@ function App() {
       <Route path="/user-dashboard" element={<UserDashboard/>}/>
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path='/UserHomePage' element={<UserHomePage/>}/>
-      <Route path="/user-profile" element={<UserProfile/>}/>
     </Routes>
   )
 }
