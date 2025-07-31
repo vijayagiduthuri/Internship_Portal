@@ -305,54 +305,6 @@ export const forgotPassword = async (req, res) => {
   }
 };
 
-//Function to get all the applications applied by a specific user
-export const getApplicationsByApplicantId = async (req, res) => {
-  const { applicantId } = req.params;
-
-  if (!applicantId) {
-    return res.status(400).json({
-      success: false,
-      message: "Applicant ID is required",
-    });
-  }
-
-  try {
-    const user = await User.findById(applicantId);
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: "User not found",
-      });
-    }
-
-    const applications = await Application.find({ applicantId })
-      .populate({
-        path: "internshipId",
-        select: "title company location duration",
-      })
-      .sort({ createdAt: -1 });
-
-    if (!applications || applications.length === 0) {
-      return res.status(200).json({
-        success: true,
-        message: "No internships applied by this user yet.",
-        applications: [],
-      });
-    }
-
-    return res.status(200).json({
-      success: true,
-      count: applications.length,
-      applications,
-    });
-  } catch (error) {
-    console.error("Error fetching applications by applicantId:", error.message);
-    return res.status(500).json({
-      success: false,
-      message: "Server error",
-    });
-  }
-};
 
 //Function for user logout
 export const logoutUser = (req, res) => {

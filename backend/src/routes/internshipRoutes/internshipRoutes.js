@@ -7,6 +7,7 @@ import {
   deleteInternship,
   getApplicationsByInternshipId,
   saveInternship,
+  getApplicationsByApplicantId
 } from "../../controllers/internshipController/internshipControllers.js";
 import { applyInternship } from "../../controllers/internshipApplicationController/internshipApplicationControllers.js";
 import { protectRoute } from "../../middlewares/jwtToken.js";
@@ -47,5 +48,11 @@ router.delete(
 );
 
 router.post("/save-internship",protectRoute,saveInternship)
+
+router.get(
+  "/get-all-internships-applied/:applicantId",
+  getApplicationsByApplicantId
+);
+
 
 export default router;
