@@ -1,6 +1,7 @@
 import crypto from "crypto";
 import Internship from "../../models/internshipModel/internshipModel.js";
 import Application from "../../models/applicationModel/applicationModel.js";
+import User from "../../models/userModel/userModel.js";
 import mongoose from "mongoose";
 import SavedInternship from "../../models/savedInternshipModel/savedInternshipModel.js";
 import { generateInternshipHash } from "../../services/internshipServices/generateInternshipHash.js";
@@ -218,6 +219,7 @@ export const getApplicationsByInternshipId = async (req, res) => {
   }
 };
 
+// Save internship
 export const saveInternship = async (req, res) => {
   const { internshipId } = req.body;
   const userId = req.user._id;
@@ -230,7 +232,7 @@ export const saveInternship = async (req, res) => {
         userId,
         internships: [internshipId],
       });
-      return res.status(201).json({ message: 'Internship saved' });
+      return res.status(200).json({ message: 'Internship saved' });
     } else {
       const index = saved.internships.indexOf(internshipId);
 
@@ -249,5 +251,54 @@ export const saveInternship = async (req, res) => {
   } catch (error) {
     console.error('Error in saving/unsaving internship:', error);
     return res.status(500).json({ message: 'Server error' });
+  }
+};
+
+//Function to get all the applications applied by a specific user
+export const getApplicationsByApplicantId = async (req, res) => {
+  const { applicantId } = req.params;
+
+  if (!applicantId) {
+    return res.status(400).json({
+      success: false,
+      message: "Applicant ID is required",
+    });
+  }
+
+  try {
+    const user = await User.findById(applicantId);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    const applications = await Application.find({ applicantId })
+      .populate({
+        path: "internshipId",
+        select: "title company location duration",
+      })
+      .sort({ createdAt: -1 });
+
+    if (!applications || applications.length === 0) {
+      return res.status(200).json({
+        success: true,
+        message: "No internships applied by this user yet.",
+        applications: [],
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      count: applications.length,
+      applications,
+    });
+  } catch (error) {
+    console.error("Error fetching applications by applicantId:", error.message);
+    return res.status(500).json({
+      success: false,
+      message: "Server error",
+    });
   }
 };

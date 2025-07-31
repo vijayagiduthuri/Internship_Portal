@@ -4,8 +4,7 @@ import {
   updatePassword,
   registerUser,
   forgotPassword,
-  logoutUser,
-  getApplicationsByApplicantId,
+  logoutUser
 } from "../../controllers/authUsers/userControllers.js";
 import { protectRoute } from "../../middlewares/jwtToken.js";
 
@@ -20,10 +19,5 @@ router.post("/update-password", protectRoute, updatePassword);
 router.post("/forgot-password", forgotPassword);
 
 router.post("/logout", logoutUser);
-
-router.get(
-  "/get-all-internships-applied/:applicantId",
-  getApplicationsByApplicantId
-);
 
 export default router;
