@@ -1,5 +1,40 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, memo } from 'react';
 import { Edit3, MapPin, Mail, Phone, Calendar, Award, Briefcase, GraduationCap, User, Link, Plus, X } from 'lucide-react';
+
+// Move InputField component outside and memoize it
+const InputField = memo(({ label, value, onChange, type = "text", placeholder = "" }) => (
+  <div className="mb-4">
+    <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
+    {type === 'textarea' ? (
+      <textarea
+        value={value || ''}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
+        rows={3}
+        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+      />
+    ) : (
+      <input
+        type={type}
+        value={value || ''}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
+        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+      />
+    )}
+  </div>
+));
+
+// Move ProfileSection component outside and memoize it
+const ProfileSection = memo(({ title, icon: Icon, children }) => (
+  <div className="bg-white rounded-lg p-6 mb-6" style={{ boxShadow: '0 10px 25px rgba(139, 69, 19, 0.15), 0 4px 12px rgba(139, 69, 19, 0.1)' }}>
+    <div className="flex items-center mb-4">
+      <Icon className="text-purple-600 mr-2" size={20} />
+      <h2 className="text-xl font-semibold text-gray-800">{title}</h2>
+    </div>
+    {children}
+  </div>
+));
 
 const UserProfile = () => {
   const [isEditing, setIsEditing] = useState(false);
@@ -27,62 +62,72 @@ const UserProfile = () => {
     }
   });
 
-  const handleInputChange = (section, field, value, index = null, id = null) => {
+  // Fixed handleInputChange function
+  const handleInputChange = useCallback((section, field, value, index = null, id = null) => {
     setProfile(prev => {
-      const newProfile = { ...prev };
-      
-      if (index !== null) {
-        newProfile[section] = [...newProfile[section]];
+      if (index !== null || id !== null) {
+        // Handle array items
+        const newArray = [...prev[section]];
         if (id) {
-          const itemIndex = newProfile[section].findIndex(item => item.id === id);
-          newProfile[section][itemIndex] = { ...newProfile[section][itemIndex], [field]: value };
-        } else {
-          newProfile[section][index] = value;
+          // Find item by ID and update it
+          const itemIndex = newArray.findIndex(item => item.id === id);
+          if (itemIndex !== -1) {
+            newArray[itemIndex] = { ...newArray[itemIndex], [field]: value };
+          }
+        } else if (index !== null) {
+          // Handle direct index update
+          if (newArray[index]) {
+            newArray[index] = { ...newArray[index], [field]: value };
+          }
         }
+        return { ...prev, [section]: newArray };
       } else if (section === 'personalInfo' || section === 'preferences') {
-        newProfile[section] = { ...newProfile[section], [field]: value };
+        // Handle nested objects
+        return {
+          ...prev,
+          [section]: { ...prev[section], [field]: value }
+        };
       }
-      
-      return newProfile;
+      return prev;
     });
-  };
+  }, []);
 
-  const addItem = (section, newItem) => {
+  const addItem = useCallback((section, newItem) => {
     setProfile(prev => ({
       ...prev,
-      [section]: [...prev[section], { ...newItem, id: Date.now() }]
+      [section]: [...prev[section], { ...newItem, id: Date.now() + Math.random() }]
     }));
-  };
+  }, []);
 
-  const removeItem = (section, id) => {
+  const removeItem = useCallback((section, id) => {
     setProfile(prev => ({
       ...prev,
       [section]: prev[section].filter(item => item.id !== id)
     }));
-  };
+  }, []);
 
-  const addSkill = (skill) => {
+  const addSkill = useCallback((skill) => {
     if (skill && !profile.skills.includes(skill)) {
       setProfile(prev => ({
         ...prev,
         skills: [...prev.skills, skill]
       }));
     }
-  };
+  }, [profile.skills]);
 
-  const removeSkill = (skillToRemove) => {
+  const removeSkill = useCallback((skillToRemove) => {
     setProfile(prev => ({
       ...prev,
       skills: prev.skills.filter(skill => skill !== skillToRemove)
     }));
-  };
+  }, []);
 
-  const scrollToSection = (sectionId) => {
+  const scrollToSection = useCallback((sectionId) => {
     const element = document.getElementById(sectionId);
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });
     }
-  };
+  }, []);
 
   const sectionItems = [
     { id: 'personal-info', name: 'Personal Info', icon: User },
@@ -93,39 +138,6 @@ const UserProfile = () => {
     { id: 'certifications', name: 'Certifications', icon: Award },
     { id: 'preferences', name: 'Preferences', icon: Briefcase }
   ];
-
-  const ProfileSection = ({ title, icon: Icon, children }) => (
-    <div className="bg-white rounded-lg p-6 mb-6" style={{ boxShadow: '0 10px 25px rgba(139, 69, 19, 0.15), 0 4px 12px rgba(139, 69, 19, 0.1)' }}>
-      <div className="flex items-center mb-4">
-        <Icon className="text-purple-600 mr-2" size={20} />
-        <h2 className="text-xl font-semibold text-gray-800">{title}</h2>
-      </div>
-      {children}
-    </div>
-  );
-
-  const InputField = ({ label, value, onChange, type = "text", placeholder = "" }) => (
-    <div className="mb-4">
-      <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
-      {type === 'textarea' ? (
-        <textarea
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          placeholder={placeholder}
-          rows={3}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-        />
-      ) : (
-        <input
-          type={type}
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          placeholder={placeholder}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-        />
-      )}
-    </div>
-  );
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#ffffff' }}>
@@ -147,7 +159,7 @@ const UserProfile = () => {
               </div>
               <h3 className="font-semibold text-white text-sm">
                 {profile.personalInfo.firstName || profile.personalInfo.lastName 
-                  ? `${profile.personalInfo.firstName} ${profile.personalInfo.lastName}`.trim()
+                  ? `${profile.personalInfo.firstName || ''} ${profile.personalInfo.lastName || ''}`.trim()
                   : 'Your Name'}
               </h3>
               <p className="text-purple-200 text-xs mt-1">
@@ -326,37 +338,37 @@ const UserProfile = () => {
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                             <InputField
                               label="Institution"
-                              value={edu.institution}
+                              value={edu.institution || ''}
                               onChange={(value) => handleInputChange('education', 'institution', value, null, edu.id)}
                               placeholder="University/College name"
                             />
                             <InputField
                               label="Degree"
-                              value={edu.degree}
+                              value={edu.degree || ''}
                               onChange={(value) => handleInputChange('education', 'degree', value, null, edu.id)}
                               placeholder="Bachelor of Science in Computer Science"
                             />
                             <InputField
                               label="Start Date"
                               type="month"
-                              value={edu.startDate}
+                              value={edu.startDate || ''}
                               onChange={(value) => handleInputChange('education', 'startDate', value, null, edu.id)}
                             />
                             <InputField
                               label="End Date"
                               type="month"
-                              value={edu.endDate}
+                              value={edu.endDate || ''}
                               onChange={(value) => handleInputChange('education', 'endDate', value, null, edu.id)}
                             />
                             <InputField
                               label="GPA"
-                              value={edu.gpa}
+                              value={edu.gpa || ''}
                               onChange={(value) => handleInputChange('education', 'gpa', value, null, edu.id)}
                               placeholder="3.8"
                             />
                             <InputField
                               label="Relevant Coursework"
-                              value={edu.relevant}
+                              value={edu.relevant || ''}
                               onChange={(value) => handleInputChange('education', 'relevant', value, null, edu.id)}
                               placeholder="Data Structures, Algorithms, Web Development"
                             />
@@ -417,33 +429,33 @@ const UserProfile = () => {
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                             <InputField
                               label="Company"
-                              value={exp.company}
+                              value={exp.company || ''}
                               onChange={(value) => handleInputChange('experience', 'company', value, null, exp.id)}
                               placeholder="Company name"
                             />
                             <InputField
                               label="Position"
-                              value={exp.position}
+                              value={exp.position || ''}
                               onChange={(value) => handleInputChange('experience', 'position', value, null, exp.id)}
                               placeholder="Your position/role"
                             />
                             <InputField
                               label="Start Date"
                               type="month"
-                              value={exp.startDate}
+                              value={exp.startDate || ''}
                               onChange={(value) => handleInputChange('experience', 'startDate', value, null, exp.id)}
                             />
                             <InputField
                               label="End Date"
                               type="month"
-                              value={exp.endDate}
+                              value={exp.endDate || ''}
                               onChange={(value) => handleInputChange('experience', 'endDate', value, null, exp.id)}
                             />
                             <div className="md:col-span-2">
                               <InputField
                                 label="Description"
                                 type="textarea"
-                                value={exp.description}
+                                value={exp.description || ''}
                                 onChange={(value) => handleInputChange('experience', 'description', value, null, exp.id)}
                                 placeholder="Describe your responsibilities and achievements..."
                               />
@@ -552,26 +564,26 @@ const UserProfile = () => {
                           <div className="grid grid-cols-1 gap-4 mb-4">
                             <InputField
                               label="Project Name"
-                              value={project.name}
+                              value={project.name || ''}
                               onChange={(value) => handleInputChange('projects', 'name', value, null, project.id)}
                               placeholder="My awesome project"
                             />
                             <InputField
                               label="Description"
                               type="textarea"
-                              value={project.description}
+                              value={project.description || ''}
                               onChange={(value) => handleInputChange('projects', 'description', value, null, project.id)}
                               placeholder="Describe what your project does and what you learned..."
                             />
                             <InputField
                               label="Technologies"
-                              value={project.technologies}
+                              value={project.technologies || ''}
                               onChange={(value) => handleInputChange('projects', 'technologies', value, null, project.id)}
                               placeholder="React, Node.js, MongoDB"
                             />
                             <InputField
                               label="Link"
-                              value={project.link}
+                              value={project.link || ''}
                               onChange={(value) => handleInputChange('projects', 'link', value, null, project.id)}
                               placeholder="https://github.com/username/project"
                             />
@@ -638,20 +650,20 @@ const UserProfile = () => {
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                             <InputField
                               label="Certification Name"
-                              value={cert.name}
+                              value={cert.name || ''}
                               onChange={(value) => handleInputChange('certifications', 'name', value, null, cert.id)}
                               placeholder="AWS Cloud Practitioner"
                             />
                             <InputField
                               label="Issuer"
-                              value={cert.issuer}
+                              value={cert.issuer || ''}
                               onChange={(value) => handleInputChange('certifications', 'issuer', value, null, cert.id)}
                               placeholder="Amazon Web Services"
                             />
                             <InputField
                               label="Date"
                               type="month"
-                              value={cert.date}
+                              value={cert.date || ''}
                               onChange={(value) => handleInputChange('certifications', 'date', value, null, cert.id)}
                             />
                           </div>
@@ -689,6 +701,7 @@ const UserProfile = () => {
               </ProfileSection>
             </div>
 
+           
             {/* Preferences */}
             <div id="preferences">
               <ProfileSection title="Internship Preferences" icon={Briefcase}>

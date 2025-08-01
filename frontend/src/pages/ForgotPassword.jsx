@@ -271,13 +271,6 @@ const ForgotPasswordPage = () => {
               >
                 ← Back to login
               </button>
-              <button
-                onClick={() => setCurrentStage(2)}
-                className="font-medium hover:underline transition-all duration-200 transform hover:scale-105"
-                style={{ color: '#620080' }}
-              >
-                Resend
-              </button>
             </div>
           </div>
         )}
