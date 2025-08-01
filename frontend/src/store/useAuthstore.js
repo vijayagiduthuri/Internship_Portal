@@ -1,6 +1,5 @@
 import { create } from 'zustand';
 import { axiosInstance } from '../lib/axios';
-import toast from '../components/Toast';
 
 export const useAuthstore = create((set, get) => ({
   phase: 'email',
@@ -14,6 +13,7 @@ export const useAuthstore = create((set, get) => ({
   userName: '',
   password: '',
   verifyToken: '',
+  resetToken: '',
   currentStage: 1,
 
   setEmail: (val) => set({ email: val, emailError: false }),
@@ -134,14 +134,14 @@ export const useAuthstore = create((set, get) => ({
 
   isGmail: (val) => /^[a-zA-Z0-9._%+-]+@gmail\.com$/.test(val),
   //login page authentication
-handleLogin: async (formData) => {
+handleLogin: async (formData,navigate,toast) => {
   try {
     const res = await axiosInstance.post('/api/authUsers/login', formData);
     if (res.data.success) {
-      toast.success(res.data.message || "Login successful!");
       localStorage.setItem("user", JSON.stringify(res.data.user));
       set({ user: res.data.user });
-      setTimeout(() => navigate("/"), 1300);
+      navigate("/userHomePage");
+      toast.success(res.data.message || "Login successful!!!!");
     } else {
       toast.error(res.data.message || "Login failed.");
     }
@@ -158,25 +158,41 @@ handleLogin: async (formData) => {
 handleForgotpassword: async (payload, toast) => {
   set({ loading: true });
   try {
-    const res = await axiosInstance.post('/api/authUsers/forgot-password', payload);
-    const { status, data } = res;
-    console.log(data);
-    if (status === 200 && data.success) {
-      console.log("Response Data:", data);
-      toast.success(data.message);
-      if (data.resetToken) {
-        set({ verifyToken: data.resetToken });
-      }
-      set((state) => ({ currentStage: state.currentStage + 1 }));
-    } else if ([400, 401, 404, 410].includes(status)) {
-      toast.error(data.message);
+    let apiPayload = {};
+    // Email only (Stage 1)
+    if (payload.email && !payload.otp && !payload.newPassword) {
+      apiPayload = { email: payload.email };
     }
-  } catch (error) {
-    console.error("Error in handleForgotpassword:", error);
-    const msg = error?.response?.data?.message;
-    toast.error(msg);
+    // Email + OTP (Stage 2)
+    else if (payload.email && payload.otp) {
+      apiPayload = { email: payload.email, otp: payload.otp };
+    }
+    // Reset password (Stage 3)
+    else if (payload.email && payload.newPassword && payload.resetToken) {
+      apiPayload = {
+        email: payload.email,
+        newPassword: payload.newPassword,
+        resetToken: payload.resetToken,
+      };
+    }
+    console.log("API Payload:", apiPayload);
+    const res = await axiosInstance.post('/api/authUsers/forgot-password', apiPayload);
+    if (res.status === 200 && res.data.success) {
+      toast.success(res.data.message);
+       if (res.data.resetToken) {
+        set({ resetToken: res.data.resetToken });
+       }
+        set((state) => ({ currentStage: state.currentStage + 1 }));
+      }
+    else {
+      toast.error(res.data.message);
+      return;
+    }
+  } catch (err) {
+    toast.error(err.response?.data?.messag);
   } finally {
     set({ loading: false });
   }
-} 
+},
+
 }));
