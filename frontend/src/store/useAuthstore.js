@@ -14,7 +14,7 @@ export const useAuthstore = create((set, get) => ({
   userName: '',
   password: '',
   verifyToken: '',
-  
+  currentStage: 1,
 
   setEmail: (val) => set({ email: val, emailError: false }),
   setOtp: (val) => set({ otp: val, otpError: false }),
@@ -154,6 +154,29 @@ handleLogin: async (formData) => {
       toast.error(message);
     }  
   }
-}
-
+},
+handleForgotpassword: async (payload, toast) => {
+  set({ loading: true });
+  try {
+    const res = await axiosInstance.post('/api/authUsers/forgot-password', payload);
+    const { status, data } = res;
+    console.log(data);
+    if (status === 200 && data.success) {
+      console.log("Response Data:", data);
+      toast.success(data.message);
+      if (data.resetToken) {
+        set({ verifyToken: data.resetToken });
+      }
+      set((state) => ({ currentStage: state.currentStage + 1 }));
+    } else if ([400, 401, 404, 410].includes(status)) {
+      toast.error(data.message);
+    }
+  } catch (error) {
+    console.error("Error in handleForgotpassword:", error);
+    const msg = error?.response?.data?.message;
+    toast.error(msg);
+  } finally {
+    set({ loading: false });
+  }
+} 
 }));

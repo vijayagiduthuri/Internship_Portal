@@ -1,7 +1,9 @@
-import React, { useState, useRef, useEffect } from 'react';
-
+import  { useState, useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuthstore } from '../store/useAuthstore';
+import toast from '../components/Toast';
 const ForgotPasswordPage = () => {
-  const [currentStage, setCurrentStage] = useState(1);
+  const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [newPassword, setNewPassword] = useState('');
@@ -11,35 +13,29 @@ const ForgotPasswordPage = () => {
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
   const [showSuccess, setShowSuccess] = useState(false);
-
+  const payloadRef = useRef({});
   const otpRefs = useRef([]);
 
-  const validateEmail = (email) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  };
+const {isGmail , handleForgotpassword , verifyToken,currentStage} = useAuthstore()
 
-  const handleGetOTP = async () => {
-    if (!email.trim() || !validateEmail(email)) {
-      setErrors({ email: 'Please enter a valid email address' });
-      return;
-    }
-    
-    setErrors({});
-    setLoading(true);
-    
-    // Simulate API call
-    setTimeout(() => {
-      setLoading(false);
-      setCurrentStage(2);
-      // Focus first OTP input
-      setTimeout(() => {
-        if (otpRefs.current[0]) {
-          otpRefs.current[0].focus();
-        }
-      }, 100);
-    }, 2000);
-  };
+const handleGetOTP = async () => {
+  if (!isGmail(email)) {
+    setErrors({ email: 'Please enter a valid email address' });
+    return;
+  }
+  setErrors({});
+  setLoading(true);
+  try {
+    let payload = { email: email.trim().toLowerCase() };
+    payloadRef.current = payload;
+    await handleForgotpassword(payloadRef.current, toast);
+    setTimeout(() => otpRefs.current[0]?.focus(), 100);
+  } catch (error) {
+    toast.error(error);
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleOtpChange = (index, value) => {
     if (!/^\d?$/.test(value)) return; // Only allow digits
@@ -74,46 +70,54 @@ const ForgotPasswordPage = () => {
 
   const handleVerifyOTP = async () => {
     const otpString = otp.join('');
+    console.log(otpString.length);
     if (otpString.length !== 6) {
       setErrors({ otp: 'Please enter a valid 6-digit OTP' });
       return;
     }
-    
-    setErrors({});
-    setLoading(true);
-    
-    // Simulate API call
-    setTimeout(() => {
-      setLoading(false);
-      setCurrentStage(3);
-    }, 2000);
+      payloadRef.current = {
+        ...payloadRef.current,
+        otp: otpString,
+      };
+  setLoading(true);
+  try {
+    await handleForgotpassword(payloadRef.current,toast);
+    updateStage(3);
+  } catch (err) {
+    toast.error("OTP verification failed.");
+  } finally {
+    setLoading(false);
+  }
   };
 
   const handleSavePassword = async () => {
     const newErrors = {};
-    
-    if (newPassword.length < 8) {
-      newErrors.newPassword = 'Password must be at least 8 characters long';
+    if (newPassword.length < 6) {
+      newErrors.newPassword = 'Password must be at least 6 characters long';
     }
-    
     if (newPassword !== confirmPassword) {
       newErrors.confirmPassword = 'Passwords do not match';
     }
-    
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
     }
-    
-    setErrors({});
-    setLoading(true);
-    
-    // Simulate API call
-    setTimeout(() => {
-      setLoading(false);
-      setShowSuccess(true);
-    }, 2000);
-  };
+      setErrors({});
+        payloadRef.current = {
+          ...payloadRef.current,
+            resetToken: verifyToken,
+          newPassword: newPassword,
+        };
+      setLoading(true);
+      try {
+        await handleForgotpassword( payloadRef.current,toast);
+        setShowSuccess(true);
+      } catch (err) {
+        toast.error("Password reset failed.");
+      } finally {
+        setLoading(false);
+      }
+    };
 
   const handleBack = () => {
     if (currentStage > 1) {
@@ -121,6 +125,19 @@ const ForgotPasswordPage = () => {
       setErrors({});
     }
   };
+
+useEffect(() => {
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      if (currentStage === 1) handleGetOTP();
+      else if (currentStage === 2) handleVerifyOTP();
+      else if (currentStage === 3) handleSavePassword();
+    }
+  };
+
+  window.addEventListener("keydown", handleKeyDown);
+  return () => window.removeEventListener("keydown", handleKeyDown);
+}, [currentStage]); 
 
   const getSubtitle = () => {
     switch (currentStage) {
@@ -231,6 +248,13 @@ const ForgotPasswordPage = () => {
 
         {/* Stage 1: Email */}
         {currentStage === 1 && (
+          <form
+              onSubmit={(e) => {
+                e.preventDefault();       // Prevent page reload
+                handleGetOTP();           // Your function to send OTP
+              }}
+              className="space-y-6"
+            >
           <div className="space-y-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -239,7 +263,9 @@ const ForgotPasswordPage = () => {
               <input
                 type="email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => {setEmail(e.target.value)
+                  setErrors({})
+                }}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 transition-all duration-200"
                 placeholder="john.doe@gmail.com"
                 disabled={loading}
@@ -265,7 +291,7 @@ const ForgotPasswordPage = () => {
             </button>
             <div className="flex justify-between items-center text-sm">
               <button
-                onClick={() => window.history.back()}
+                onClick={() => navigate('/login')}
                 className="flex items-center font-medium hover:underline transition-all duration-200 transform hover:scale-105"
                 style={{ color: '#620080' }}
               >
@@ -273,10 +299,18 @@ const ForgotPasswordPage = () => {
               </button>
             </div>
           </div>
+          </form>
         )}
 
         {/* Stage 2: OTP */}
         {currentStage === 2 && (
+          <form
+              onSubmit={(e) => {
+                e.preventDefault();       // Prevent page reload
+                handleGetOTP();           // Your function to send OTP
+              }}
+              className="space-y-6"
+            >
           <div className="space-y-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-4">
@@ -334,10 +368,18 @@ const ForgotPasswordPage = () => {
               </button>
             </div>
           </div>
+          </form>
         )}
 
         {/* Stage 3: New Password */}
         {currentStage === 3 && (
+          <form
+              onSubmit={(e) => {
+                e.preventDefault();       // Prevent page reload
+                handleGetOTP();           // Your function to send OTP
+              }}
+              className="space-y-6"
+            >
           <div className="space-y-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -400,7 +442,7 @@ const ForgotPasswordPage = () => {
             </button>
             <div className="flex justify-center">
               <button
-                onClick={handleBack}
+                onClick={()=> navigate('/login')}
                 className="flex items-center text-sm font-medium hover:underline transition-all duration-200 transform hover:scale-105"
                 style={{ color: '#620080' }}
               >
@@ -408,9 +450,11 @@ const ForgotPasswordPage = () => {
               </button>
             </div>
           </div>
+          </form>
         )}
       </div>
     </div>
+    
   );
 };
 
