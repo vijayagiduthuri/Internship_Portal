@@ -1,7 +1,6 @@
 import nodemailer from "nodemailer";
 import dotenv from "dotenv";
 
-
 dotenv.config();
 
 const transporter = nodemailer.createTransport({
@@ -13,6 +12,20 @@ const transporter = nodemailer.createTransport({
 });
 
 export const sendMail = async (userEmail, htmlContent, subject) => {
+
+  //Email Service Bypassed
+    if (process.env.DISABLE_EMAILS === "true") {
+      console.log("=== Email Sending Bypassed ===");
+      console.log("To:", userEmail);
+      console.log("Subject:", subject);
+      console.log("HTML Content:", htmlContent);
+      console.log("=== End of Email ===");
+      return {
+        success: true,
+        message: "Email sent successfully",
+      };
+    }
+
   // Send mail
   try {
     const info = await transporter.sendMail({
