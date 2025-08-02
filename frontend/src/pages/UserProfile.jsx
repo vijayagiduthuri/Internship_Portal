@@ -3,11 +3,12 @@ import { Edit3, MapPin, Mail, Phone, Calendar, Award, Briefcase, GraduationCap, 
 
 const UserProfile = () => {
   const [isEditing, setIsEditing] = useState(false);
+  const userInfo =localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")) : {};
   const [profile, setProfile] = useState({
     personalInfo: {
-      firstName: '',
+      firstName:'',
       lastName: '',
-      email: '',
+      email: userInfo.email || '',
       phone: '',
       location: '',
       dateOfBirth: '',
@@ -146,9 +147,7 @@ const UserProfile = () => {
                 )}
               </div>
               <h3 className="font-semibold text-white text-sm">
-                {profile.personalInfo.firstName || profile.personalInfo.lastName 
-                  ? `${profile.personalInfo.firstName} ${profile.personalInfo.lastName}`.trim()
-                  : 'Your Name'}
+                {userInfo?`${userInfo?.userName}`:'Your Name'}
               </h3>
               <p className="text-purple-200 text-xs mt-1">
                 {profile.preferences.desiredRole || 'Your Role'}
@@ -227,7 +226,7 @@ const UserProfile = () => {
                     <InputField
                       label="First Name"
                       value={profile.personalInfo.firstName}
-                      onChange={(value) => handleInputChange('personalInfo', 'firstName', value)}
+                      onChange={(e) => handleInputChange('personalInfo', 'firstName', e.target.value)}
                       placeholder="Enter your first name"
                     />
                     <InputField

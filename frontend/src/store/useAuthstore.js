@@ -84,11 +84,10 @@ export const useAuthstore = create((set, get) => ({
     }
   },
 
-  handleSignupPhase: async (navigate,toast) => {
+   handleSignupPhase: async (navigate,toast) => {
     const { email, userName, password, verifyToken } = get();
     const errors = {};
     let hasErr = false;
-
     if (!userName) {
       errors.userName = true;
       hasErr = true;
@@ -101,60 +100,81 @@ export const useAuthstore = create((set, get) => ({
       set({ credentialsError: errors });
       return;
     }
-
     set({ loading: true });
     try {
-      const res = await axiosInstance.post('/api/authUsers/register',{
+      const res = await axiosInstance.post('/api/authUsers/register', {
         email: email.trim().toLowerCase(),
         userName,
         password,
         verifyToken,
-      });
-      if(res.status===401) toast.error(res.data.message)
-      else if (res.status === 201 && res.data.success) {
-        toast.success(res.data.message || "Registration successful!");
-        setTimeout(() => navigate("/"), 1300);
-      } else {
-        toast.error(res.data.message || "Signup failed.");
-      }
-    } catch (error) {
-      const msg = error.response?.data?.message?.toLowerCase() || "";
-      if (/user.?name/.test(msg)) {
+      });    
+      console.log(res);
+    const success = res?.data?.success;
+    const message = res?.data?.message;
+
+    if (res?.status === 201 && success) {
+      toast.success(message || "Registration successful!");
+      setTimeout(() => navigate("/userHomePage"), 1300);
+    } else {
+      toast.error(message || "Signup failed.");
+    }
+
+  } catch (error) {
+    console.error("Signup error object:", error);
+
+    const errorMsg =
+      error?.response?.data?.message ||
+      error?.response?.data?.error ||  // fallback
+      "Server error.";
+
+    toast?.error(errorMsg);
+
+    // Optional: Custom error triggers
+    if (typeof errorMsg === "string") {
+      const msg = errorMsg.toLowerCase();
+      if (/user.?name/.test(msg) || /password/.test(msg)) {
         get().triggerShake("credentialsError");
-      } else if (/password/.test(msg)) {
-        get().triggerShake("credentialsError");
-      } else {
-        console.log(error.message);
-        toast.error(msg || "Server error.");
       }
-    } finally {
+    }
+}
+finally {
       set({ loading: false });
     }
+
   },
 
   isGmail: (val) => /^[a-zA-Z0-9._%+-]+@gmail\.com$/.test(val),
   //login page authentication
-handleLogin: async (formData,navigate,toast) => {
+handleLogin: async (formData, navigate, toast) => {
   try {
     const res = await axiosInstance.post('/api/authUsers/login', formData);
-    if (res.data.success) {
-      localStorage.setItem("user", JSON.stringify(res.data.user));
-      set({ user: res.data.user });
-      navigate("/userHomePage");
-      toast.success(res.data.message || "Login successful!!!!");
+    console.log("Full Login Response:", res);
+
+    const user = res?.data?.user;
+    const message = res?.data?.message;
+
+    if (res.status === 200 && user) {
+      localStorage.setItem("user", JSON.stringify(user));
+      set({ user });
+      toast.success(message || "Login successful!");
+      setTimeout(() => navigate("/userHomePage"), 700);
     } else {
-      toast.error(res.data.message || "Login failed.");
+      toast.error(message || "Login failed.");
     }
+
   } catch (err) {
-    const status = err.response?.status;
-    const message = err.response?.data?.message || "Server error.";
-    if (status === 401) {
-      toast.error(message|| "Unauthorized access.");
-    } else {
-      toast.error(message);
-    }  
+    console.log("Login Error:", err);
+    const message =
+      err?.response?.data?.message ??
+      err?.message ??
+      "Something went wrong. Please try again.";
+    toast.error(message);
+  } finally {
+    set({ loading: false });
   }
 },
+
+
 handleForgotpassword: async (payload, toast) => {
   set({ loading: true });
   try {

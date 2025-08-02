@@ -1,6 +1,7 @@
 import React, {useRef, useEffect } from "react";
 import { useAuthstore } from "../store/useAuthstore";
 import toast from "../components/Toast";
+import { useNavigate } from "react-router-dom";
 
 const Signup = () => {
   const {
@@ -22,7 +23,7 @@ const Signup = () => {
     handleOtpPhase,
     handleSignupPhase,
   } = useAuthstore();
-
+ const navigate = useNavigate();
   const otpInputs = useRef([...Array(6)].map(() => React.createRef()));
   const handleOtpInput = (e, idx) => {
     const v = e.target.value.replace(/[^0-9]/g, "");
@@ -73,12 +74,31 @@ const Signup = () => {
       if (loading) return;
       if (e.key === "Enter") {
         if (phase==="email") handleEmailPhase(toast);
-        if (phase==="credentials") handleSignupPhase(toast);
+        if (phase==="credentials") handleSignupPhase(navigate , toast);
       }
     }
     window.addEventListener("keydown", handleEnter);
     return () => window.removeEventListener("keydown", handleEnter);
   }, [phase, email, userName, password, otp, loading, handleEmailPhase, handleSignupPhase, toast]);
+  
+const handleOtpPaste = (e) => {
+  e.preventDefault();
+  const pastedData = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, 6);
+  if (pastedData.length < 6) return;
+
+  const newOtp = [...otp];
+  for (let i = 0; i < 6; i++) {
+    newOtp[i] = pastedData[i];
+    if (otpInputs.current[i]?.current) {
+      otpInputs.current[i].current.value = pastedData[i];
+    }
+  }
+  setOtp(newOtp);
+  // Optionally trigger OTP validation after paste
+  if (newOtp.every((digit) => digit)) {
+    setTimeout(() => handleOtpPhase(newOtp, toast), 100);
+  }
+};
 
   return (
     <div className="min-h-screen flex flex-col lg:flex-row relative">
@@ -192,9 +212,21 @@ const Signup = () => {
                           otpError ? "border-red-500 animate-shake" : "border-gray-300"
                         } rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200`}
                         disabled={loading}
+                          onPaste={(e) => handleOtpPaste(e)}
                       />
                     ))}
                   </div>
+                   <div className="flex justify-between items-center mt-4 px-1 text-sm sm:text-base">
+                    <span className="text-gray-500"></span>
+                      <button
+                        type="button"
+                        className="text-purple-600 hover:underline font-medium ml-2"
+                        onClick={() => handleEmailPhase(toast)}
+                        disabled={loading}
+                      >
+                        Resend OTP
+                      </button>
+                    </div>
                 </div>
               </>
             )}
@@ -245,7 +277,7 @@ const Signup = () => {
                 <div className="flex justify-center">
                   <button
                     className="w-full cursor-pointer text-white font-bold shadow-md hover:scale-[1.02] sm:hover:scale-[1.05] shadow-purple-800 py-2.5 bg-gradient-to-bl from-purple-900 to-purple-900 rounded-md transition-transform duration-200 disabled:opacity-50"
-                    onClick={()=>handleSignupPhase(toast)}
+                    onClick={()=>handleSignupPhase(navigate,toast)}
                     disabled={loading || !userName || !password}
                   >
                     {loading ? "Signing up..." : "Sign Up"}

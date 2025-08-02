@@ -37,7 +37,13 @@ const   isGmail =  (val) => /^[a-zA-Z0-9._%+-]+@gmail\.com$/.test(val);
   };
 const handleSubmit = async () => {
   if (validateForm()) {
+    setLoading(true);
+    try{
     await handleLogin(formData,navigate,toast);
+    setLoading(false);
+    } catch (error) {
+      toast.error(error.message|| 'Login failed. Please try again.');
+    }
   }
 };
 
