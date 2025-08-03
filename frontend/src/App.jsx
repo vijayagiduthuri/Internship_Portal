@@ -6,6 +6,7 @@ import Login from './pages/Login'
 import CompanyRegistration from './pages/CompanyRegistrartion'
 import UserProfile from './pages/UserProfile'
 import UserHomePage from './pages/UserHomePage';
+import InternshipSettings from './pages/InternshipSettings';
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
       <Route path="/company-registration" element={<CompanyRegistration/>}/>
       <Route path='/UserHomePage' element={<UserHomePage/>}/>
       <Route path="user-profile" element={<UserProfile/>}/>
+      <Route path="InternshipSettings" element={<InternshipSettings/>}/>
     </Routes>
   )
 }

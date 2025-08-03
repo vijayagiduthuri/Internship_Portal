@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Search, MapPin, Clock, DollarSign, Building, User, Bell, Upload, Star, Heart, Bookmark, Menu, X, Filter } from 'lucide-react';
 
-const UserHomePage = () => {
+const JobSearchPortal = () => {
   const [searchTerm, setSearchTerm] = useState('Designer');
   const [location, setLocation] = useState('Chicago, IL');
   const [selectedFilters, setSelectedFilters] = useState({
@@ -17,6 +17,7 @@ const UserHomePage = () => {
   const [showMobileFilters, setShowMobileFilters] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
+  const [selectedJob, setSelectedJob] = useState(null);
 
   const jobTypes = [
     { name: 'All (284)', value: 'all', count: 284 },
@@ -44,17 +45,6 @@ const UserHomePage = () => {
     { name: 'Zebra Technologies (24)', value: 'zebra', count: 24 }
   ];
 
-  const popularCompanies = [
-    { name: 'Workday', logo: '💼' },
-    { name: 'Salesforce', logo: '☁️' },
-    { name: 'Marriott International', logo: '🏨' },
-    { name: 'CarMax', logo: '🚗' },
-    { name: 'SAP America Inc.', logo: '📊' },
-    { name: 'Deloitte', logo: '💡' },
-    { name: 'Accenture', logo: '⚡' },
-    { name: 'Alliance Data', logo: '🔗' }
-  ];
-
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -80,7 +70,32 @@ const UserHomePage = () => {
       salary: '$59k - $69k',
       posted: '2 days ago',
       featured: false,
-      description: 'Looking for a creative visual designer to join our team and create stunning visual experiences for our clients.'
+      description: 'Looking for a creative visual designer to join our team and create stunning visual experiences for our clients.',
+      fullDescription: `We are seeking a talented Visual Designer to join our growing creative team at Deloitte. In this role, you will be responsible for creating compelling visual content across multiple platforms and mediums.
+
+Key Responsibilities:
+• Design and develop visual concepts for client presentations, marketing materials, and digital platforms
+• Collaborate with cross-functional teams including UX designers, developers, and project managers
+• Maintain brand consistency across all visual communications
+• Create wireframes, mockups, and prototypes for web and mobile applications
+• Stay current with design trends and best practices
+
+Requirements:
+• Bachelor's degree in Graphic Design, Visual Arts, or related field
+• 3-5 years of professional design experience
+• Proficiency in Adobe Creative Suite (Photoshop, Illustrator, InDesign)
+• Strong portfolio demonstrating creative problem-solving skills
+• Experience with web design principles and responsive design
+• Excellent communication and presentation skills
+
+Benefits:
+• Competitive salary range: $59,000 - $69,000
+• Comprehensive health insurance
+• 401(k) matching
+• Professional development opportunities
+• Hybrid work environment`,
+      requirements: ['Adobe Creative Suite', 'Web Design', 'Brand Design', 'UI/UX Knowledge'],
+      benefits: ['Health Insurance', '401(k)', 'Flexible Hours', 'Remote Work']
     },
     {
       id: 2,
@@ -92,7 +107,33 @@ const UserHomePage = () => {
       salary: '$64k - $75k',
       posted: '4 hours ago',
       featured: true,
-      description: 'Join our product design team to create amazing user experiences that delight millions of customers.'
+      description: 'Join our product design team to create amazing user experiences that delight millions of customers.',
+      fullDescription: `GrubHub is looking for a passionate Product Designer to help shape the future of food delivery. You'll work on products used by millions of customers daily, focusing on creating intuitive and delightful user experiences.
+
+Key Responsibilities:
+• Design end-to-end user experiences for web and mobile applications
+• Conduct user research and usability testing to inform design decisions
+• Create user flows, wireframes, prototypes, and high-fidelity designs
+• Collaborate with product managers and engineers to bring designs to life
+• Contribute to and maintain our design system
+• Present design concepts and rationale to stakeholders
+
+Requirements:
+• 3-5 years of product design experience
+• Strong portfolio showcasing UX/UI design work
+• Proficiency in Figma, Sketch, or similar design tools
+• Experience with user research methodologies
+• Understanding of mobile-first and responsive design principles
+• Knowledge of front-end development principles (HTML/CSS/JS)
+
+Why GrubHub:
+• Competitive salary: $64,000 - $75,000
+• Stock options
+• Unlimited PTO
+• Free meals from local restaurants
+• Learning and development budget`,
+      requirements: ['Figma/Sketch', 'User Research', 'Mobile Design', 'Design Systems'],
+      benefits: ['Stock Options', 'Unlimited PTO', 'Free Meals', 'Learning Budget']
     },
     {
       id: 3,
@@ -104,7 +145,33 @@ const UserHomePage = () => {
       salary: '$35k',
       posted: '20 days ago',
       featured: false,
-      description: 'Entry-level designer position with growth opportunities in a dynamic creative environment.'
+      description: 'Entry-level designer position with growth opportunities in a dynamic creative environment.',
+      fullDescription: `Frey Design Group is offering an exciting paid internship opportunity for a budding designer looking to kickstart their career in a supportive, creative environment.
+
+What You'll Do:
+• Assist senior designers with various projects including branding, print, and digital design
+• Create mockups and presentations for client pitches
+• Participate in brainstorming sessions and creative reviews
+• Learn about project management and client communication
+• Develop skills in multiple design disciplines
+
+What We're Looking For:
+• Recent graduate or current student in Graphic Design or related field
+• Basic knowledge of Adobe Creative Suite
+• Strong creative thinking and problem-solving skills
+• Eagerness to learn and take on new challenges
+• Good communication and collaboration skills
+• Portfolio showing creative potential
+
+What We Offer:
+• Competitive internship salary: $35,000 annually
+• Mentorship from experienced designers
+• Opportunity to work on real client projects
+• Potential for full-time offer after internship
+• Creative and supportive work environment
+• Professional development workshops`,
+      requirements: ['Adobe Creative Suite', 'Portfolio', 'Creative Thinking', 'Team Collaboration'],
+      benefits: ['Mentorship', 'Real Projects', 'Full-time Potential', 'Workshops']
     }
   ]);
 
@@ -144,6 +211,10 @@ const UserHomePage = () => {
       location: [],
       company: []
     });
+  };
+
+  const handleJobClick = (job) => {
+    setSelectedJob(job);
   };
 
   // Filter Component for reusability
@@ -397,14 +468,7 @@ const UserHomePage = () => {
             </button>
             
             <div className="hidden md:flex items-center space-x-4">
-              <button 
-                onClick={() => setShowResumeUpload(true)}
-                className="flex items-center space-x-2 bg-white hover:bg-gray-100 transition-colors px-4 py-2 rounded-lg font-semibold"
-                style={{color: '#620080'}}
-              >
-                <Upload size={16} />
-                <span>Upload Resume</span>
-              </button>
+             
             </div>
           </div>
 
@@ -417,14 +481,7 @@ const UserHomePage = () => {
                 <button className="text-left" style={{color: 'rgba(255,255,255,0.8)'}}>Companies</button>
                 <button className="text-left" style={{color: 'rgba(255,255,255,0.8)'}}>Reviews</button>
                 <button className="text-left" style={{color: 'rgba(255,255,255,0.8)'}}>Services</button>
-                <button 
-                  onClick={() => setShowResumeUpload(true)}
-                  className="flex items-center space-x-2 bg-white text-center justify-center hover:bg-gray-100 transition-colors px-4 py-2 rounded-lg font-semibold mt-3"
-                  style={{color: '#620080'}}
-                >
-                  <Upload size={16} />
-                  <span>Upload Resume</span>
-                </button>
+                
               </nav>
             </div>
           )}
@@ -512,23 +569,8 @@ const UserHomePage = () => {
           </div>
 
           {/* Middle - Job Listings */}
-          <div className="flex-1 px-4 lg:px-0">
-            {/* Resume Upload CTA */}
-            <div className="border-2 border-dashed rounded-lg p-4 lg:p-6 mb-4 lg:mb-6" style={{backgroundColor: 'rgba(98, 0, 128, 0.05)', borderColor: 'rgba(98, 0, 128, 0.3)'}}>
-              <div className="flex items-center mb-3">
-                <Upload className="mr-3" style={{color: '#620080'}} size={24} />
-                <h3 className="font-semibold text-gray-900 text-sm md:text-base">Upload your resume</h3>
-              </div>
-              <p className="text-gray-600 mb-4 text-sm md:text-base">We'll match you with the best jobs. Right job, Right away!</p>
-              <button 
-                onClick={() => setShowResumeUpload(true)}
-                className="w-full text-white py-2 lg:py-3 px-4 rounded-lg font-medium hover:bg-opacity-90 transition-colors text-sm md:text-base"
-                style={{backgroundColor: '#620080'}}
-              >
-                Choose File
-              </button>
-            </div>
-
+          <div className={`px-4 lg:px-0 transition-all duration-300 ${selectedJob ? 'lg:w-1/2' : 'flex-1'}`}>
+            
             <div className="bg-white rounded-lg shadow-sm border">
               {/* Results Header */}
               <div className="p-4 border-b border-gray-200">
@@ -553,7 +595,13 @@ const UserHomePage = () => {
               {/* Job Listings */}
               <div className="divide-y divide-gray-200">
                 {jobs.map((job) => (
-                  <div key={job.id} className="p-4 lg:p-6 hover:bg-gray-50 transition-colors">
+                  <div 
+                    key={job.id} 
+                    className={`p-4 lg:p-6 hover:bg-gray-50 transition-colors cursor-pointer ${
+                      selectedJob?.id === job.id ? 'bg-purple-50 border-l-4 border-purple-600' : ''
+                    }`}
+                    onClick={() => handleJobClick(job)}
+                  >
                     <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-4">
                       <div className="flex items-start space-x-3 lg:space-x-4 flex-1">
                         <div className="w-10 h-10 lg:w-12 lg:h-12 rounded-lg flex items-center justify-center flex-shrink-0" style={{backgroundColor: '#620080'}}>
@@ -562,7 +610,7 @@ const UserHomePage = () => {
                           </span>
                         </div>
                         <div className="flex-1 min-w-0">
-                          <h3 className="font-semibold text-base lg:text-lg text-gray-900 mb-1 hover:text-purple-700 cursor-pointer">{job.title}</h3>
+                          <h3 className="font-semibold text-base lg:text-lg text-gray-900 mb-1 hover:text-purple-700">{job.title}</h3>
                           <p className="text-gray-600 mb-2 text-sm lg:text-base">{job.company} • {job.location}</p>
                           <div className="flex flex-wrap items-center gap-2 lg:gap-4 text-xs lg:text-sm text-gray-600">
                             <span className="bg-gray-100 px-2 py-1 rounded text-xs font-medium">{job.type}</span>
@@ -578,7 +626,10 @@ const UserHomePage = () => {
                           </span>
                         )}
                         <button 
-                          onClick={() => toggleSaveJob(job.id)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleSaveJob(job.id);
+                          }}
                           className={`text-xs lg:text-sm px-3 py-1 rounded border transition-colors flex-1 sm:flex-none ${
                             savedJobs.has(job.id) 
                               ? 'text-white border-transparent' 
@@ -600,7 +651,14 @@ const UserHomePage = () => {
                     
                     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                       <span className="text-sm text-gray-500">Posted {job.posted}</span>
-                      <button className="text-sm font-medium hover:underline" style={{color: '#620080'}}>
+                      <button 
+                        className="text-sm font-medium hover:underline" 
+                        style={{color: '#620080'}}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleJobClick(job);
+                        }}
+                      >
                         View Details
                       </button>
                     </div>
@@ -610,49 +668,136 @@ const UserHomePage = () => {
             </div>
           </div>
 
-          {/* Right Sidebar (Tablet and Desktop) */}
-          <div className="hidden md:block w-64 flex-shrink-0 space-y-6">
-            {/* Newsletter Signup */}
-            <div className="bg-white rounded-lg shadow-sm p-6 border">
-              <h3 className="font-semibold text-gray-900 mb-2">Be the first to see new jobs in <span style={{color: '#620080'}}>Chicago, IL</span></h3>
-              <div className="mb-4">
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full p-3 border border-gray-300 rounded-lg mb-3 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
-                  placeholder="steve.scaleup@gmail.com"
-                />
-                <button 
-                  onClick={handleSubscribe}
-                  className="w-full text-white py-3 rounded-lg font-medium hover:bg-opacity-90 transition-colors"
-                  style={{backgroundColor: '#620080'}}
-                >
-                  {isSubscribed ? 'Subscribed! ✓' : 'Subscribe Now'}
-                </button>
-              </div>
-              <p className="text-xs text-gray-500">You interested: HTML, CSS</p>
-            </div>
-
-            {/* Popular Companies */}
-            <div className="bg-white rounded-lg shadow-sm p-6 border">
-              <h3 className="font-semibold text-gray-900 mb-4">Popular in <span style={{color: '#620080'}}>Chicago</span></h3>
-              <div className="space-y-3">
-                {popularCompanies.map((company, index) => (
-                  <button 
-                    key={index}
-                    className="flex items-center space-x-3 w-full p-2 hover:bg-gray-50 rounded-lg transition-colors text-left"
-                  >
-                    <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{backgroundColor: 'rgba(98, 0, 128, 0.1)'}}>
-                      <span className="text-sm font-semibold" style={{color: '#620080'}}>
-                        {company.name.charAt(0)}
-                      </span>
+          {/* Job Details Panel */}
+          {selectedJob && (
+            <div className="hidden lg:block w-1/2 pl-6">
+              <div className="bg-white rounded-lg shadow-sm border sticky top-4 max-h-screen overflow-y-auto">
+                {/* Header */}
+                <div className="p-6 border-b border-gray-200">
+                  <div className="flex justify-between items-start mb-4">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-12 h-12 rounded-lg flex items-center justify-center" style={{backgroundColor: '#620080'}}>
+                        <span className="text-white font-semibold">{selectedJob.company.charAt(0)}</span>
+                      </div>
+                      <div>
+                        <h2 className="text-xl font-bold text-gray-900">{selectedJob.title}</h2>
+                        <p className="text-gray-600">{selectedJob.company}</p>
+                      </div>
                     </div>
-                    <span className="text-sm text-gray-700 font-medium">{company.name}</span>
-                  </button>
-                ))}
+                    <button 
+                      onClick={() => setSelectedJob(null)}
+                      className="p-2 hover:bg-gray-100 rounded-lg"
+                    >
+                      <X size={20} className="text-gray-500" />
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4 mb-4">
+                    <div className="flex items-center space-x-2">
+                      <MapPin size={16} className="text-gray-500" />
+                      <span className="text-sm text-gray-700">{selectedJob.location}</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Clock size={16} className="text-gray-500" />
+                      <span className="text-sm text-gray-700">{selectedJob.type}</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <DollarSign size={16} className="text-gray-500" />
+                      <span className="text-sm text-gray-700">{selectedJob.salary}</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <User size={16} className="text-gray-500" />
+                      <span className="text-sm text-gray-700">{selectedJob.experience}</span>
+                    </div>
+                  </div>
+
+                  <div className="flex space-x-3">
+                    <button 
+                      className="flex-1 text-white py-3 px-6 rounded-lg font-semibold hover:bg-opacity-90 transition-colors"
+                      style={{backgroundColor: '#620080'}}
+                    >
+                      Apply Now
+                    </button>
+                    <button 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleSaveJob(selectedJob.id);
+                      }}
+                      className={`px-6 py-3 rounded-lg border font-semibold transition-colors ${
+                        savedJobs.has(selectedJob.id) 
+                          ? 'text-white border-transparent' 
+                          : 'hover:bg-purple-50 border-purple-300'
+                      }`}
+                      style={{
+                        backgroundColor: savedJobs.has(selectedJob.id) ? '#620080' : 'transparent',
+                        color: savedJobs.has(selectedJob.id) ? 'white' : '#620080'
+                      }}
+                    >
+                      <Heart size={16} className={savedJobs.has(selectedJob.id) ? 'fill-current' : ''} />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Content */}
+                <div className="p-6 space-y-6">
+                  {/* Job Description */}
+                  <div>
+                    <h3 className="font-semibold text-gray-900 mb-3">Job Description</h3>
+                    <div className="text-gray-700 text-sm leading-relaxed whitespace-pre-line">
+                      {selectedJob.fullDescription}
+                    </div>
+                  </div>
+
+                  {/* Requirements */}
+                  <div>
+                    <h3 className="font-semibold text-gray-900 mb-3">Key Skills</h3>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedJob.requirements.map((req, index) => (
+                        <span 
+                          key={index}
+                          className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm font-medium"
+                        >
+                          {req}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Benefits */}
+                  <div>
+                    <h3 className="font-semibold text-gray-900 mb-3">Benefits</h3>
+                    <div className="grid grid-cols-2 gap-2">
+                      {selectedJob.benefits.map((benefit, index) => (
+                        <div key={index} className="flex items-center space-x-2">
+                          <div className="w-2 h-2 rounded-full" style={{backgroundColor: '#620080'}}></div>
+                          <span className="text-sm text-gray-700">{benefit}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Company Info */}
+                  <div>
+                    <h3 className="font-semibold text-gray-900 mb-3">About {selectedJob.company}</h3>
+                    <p className="text-gray-700 text-sm leading-relaxed">
+                      {selectedJob.company} is a leading company in its field, committed to innovation and excellence. 
+                      We offer a collaborative work environment where talented professionals can grow their careers 
+                      and make a meaningful impact.
+                    </p>
+                  </div>
+
+                  {/* Posted Info */}
+                  <div className="pt-4 border-t border-gray-200">
+                    <p className="text-sm text-gray-500">Posted {selectedJob.posted}</p>
+                  </div>
+                </div>
               </div>
             </div>
+          )}
+
+          {/* Right Sidebar (Tablet and Desktop) - Hidden when job details are shown */}
+          <div className={`hidden md:block space-y-6 transition-all duration-300 ${selectedJob ? 'hidden' : 'w-64 flex-shrink-0'}`}>
+            
           </div>
           
           {/* Right margin for desktop */}
@@ -660,38 +805,139 @@ const UserHomePage = () => {
         </div>
       </div>
 
-      {/* Resume Upload Modal */}
-      {showResumeUpload && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white p-4 lg:p-6 rounded-lg max-w-md w-full shadow-xl">
-            <h3 className="text-lg lg:text-xl font-semibold mb-4">Upload your resume</h3>
-            <p className="text-gray-600 mb-4 text-sm lg:text-base">We'll match you with the best jobs. Right job, Right away!</p>
-            <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 lg:p-8 text-center mb-4 hover:border-purple-400 transition-colors">
-              <Upload className="mx-auto mb-2 text-gray-400" size={32} />
-              <p className="text-gray-600 font-medium text-sm lg:text-base">Click to upload or drag and drop</p>
-              <p className="text-xs lg:text-sm text-gray-400 mt-1">PDF, DOC, DOCX (Max 5MB)</p>
-              <input type="file" className="hidden" accept=".pdf,.doc,.docx" />
+      {/* Mobile Job Details Modal */}
+      {selectedJob && (
+        <div className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-50">
+          <div className="bg-white h-full overflow-y-auto">
+            <div className="p-4 border-b border-gray-200 flex justify-between items-center sticky top-0 bg-white z-10">
+              <h3 className="font-semibold text-gray-900">Job Details</h3>
+              <button 
+                onClick={() => setSelectedJob(null)}
+                className="p-1 hover:bg-gray-100 rounded"
+              >
+                <X size={20} />
+              </button>
             </div>
-            <div className="flex gap-3">
-              <button 
-                onClick={() => setShowResumeUpload(false)}
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-medium text-sm lg:text-base"
-              >
-                Cancel
-              </button>
-              <button 
-                onClick={() => setShowResumeUpload(false)}
-                className="flex-1 px-4 py-2 text-white rounded-lg hover:bg-opacity-90 transition-colors font-medium text-sm lg:text-base"
-                style={{backgroundColor: '#620080'}}
-              >
-                Upload
-              </button>
+            
+            <div className="p-4">
+              {/* Mobile Job Details Content */}
+              <div className="space-y-6">
+                {/* Header */}
+                <div>
+                  <div className="flex items-center space-x-3 mb-4">
+                    <div className="w-12 h-12 rounded-lg flex items-center justify-center" style={{backgroundColor: '#620080'}}>
+                      <span className="text-white font-semibold">{selectedJob.company.charAt(0)}</span>
+                    </div>
+                    <div>
+                      <h2 className="text-xl font-bold text-gray-900">{selectedJob.title}</h2>
+                      <p className="text-gray-600">{selectedJob.company}</p>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 gap-3 mb-4">
+                    <div className="flex items-center space-x-2">
+                      <MapPin size={16} className="text-gray-500" />
+                      <span className="text-sm text-gray-700">{selectedJob.location}</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Clock size={16} className="text-gray-500" />
+                      <span className="text-sm text-gray-700">{selectedJob.type}</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <DollarSign size={16} className="text-gray-500" />
+                      <span className="text-sm text-gray-700">{selectedJob.salary}</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <User size={16} className="text-gray-500" />
+                      <span className="text-sm text-gray-700">{selectedJob.experience}</span>
+                    </div>
+                  </div>
+
+                  <div className="flex space-x-3">
+                    <button 
+                      className="flex-1 text-white py-3 px-6 rounded-lg font-semibold hover:bg-opacity-90 transition-colors"
+                      style={{backgroundColor: '#620080'}}
+                    >
+                      Apply Now
+                    </button>
+                    <button 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleSaveJob(selectedJob.id);
+                      }}
+                      className={`px-6 py-3 rounded-lg border font-semibold transition-colors ${
+                        savedJobs.has(selectedJob.id) 
+                          ? 'text-white border-transparent' 
+                          : 'hover:bg-purple-50 border-purple-300'
+                      }`}
+                      style={{
+                        backgroundColor: savedJobs.has(selectedJob.id) ? '#620080' : 'transparent',
+                        color: savedJobs.has(selectedJob.id) ? 'white' : '#620080'
+                      }}
+                    >
+                      <Heart size={16} className={savedJobs.has(selectedJob.id) ? 'fill-current' : ''} />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Job Description */}
+                <div>
+                  <h3 className="font-semibold text-gray-900 mb-3">Job Description</h3>
+                  <div className="text-gray-700 text-sm leading-relaxed whitespace-pre-line">
+                    {selectedJob.fullDescription}
+                  </div>
+                </div>
+
+                {/* Requirements */}
+                <div>
+                  <h3 className="font-semibold text-gray-900 mb-3">Key Skills</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {selectedJob.requirements.map((req, index) => (
+                      <span 
+                        key={index}
+                        className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm font-medium"
+                      >
+                        {req}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Benefits */}
+                <div>
+                  <h3 className="font-semibold text-gray-900 mb-3">Benefits</h3>
+                  <div className="space-y-2">
+                    {selectedJob.benefits.map((benefit, index) => (
+                      <div key={index} className="flex items-center space-x-2">
+                        <div className="w-2 h-2 rounded-full" style={{backgroundColor: '#620080'}}></div>
+                        <span className="text-sm text-gray-700">{benefit}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Company Info */}
+                <div>
+                  <h3 className="font-semibold text-gray-900 mb-3">About {selectedJob.company}</h3>
+                  <p className="text-gray-700 text-sm leading-relaxed">
+                    {selectedJob.company} is a leading company in its field, committed to innovation and excellence. 
+                    We offer a collaborative work environment where talented professionals can grow their careers 
+                    and make a meaningful impact.
+                  </p>
+                </div>
+
+                {/* Posted Info */}
+                <div className="pt-4 border-t border-gray-200">
+                  <p className="text-sm text-gray-500">Posted {selectedJob.posted}</p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       )}
+      
     </div>
   );
 };
 
-export default UserHomePage;
+export default JobSearchPortal;
