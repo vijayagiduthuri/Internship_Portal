@@ -361,60 +361,11 @@ const UserAnalyticsDashboard = () => {
     </div>
   );
 
-  // Floating bubble animation component
-  const FloatingBubbles = () => {
-    const bubbles = Array.from({ length: 8 }, (_, i) => ({
-      id: i,
-      size: Math.random() * 50 + 25,
-      left: Math.random() * 100,
-      delay: Math.random() * 25,
-      duration: Math.random() * 12 + 18,
-    }));
-
-    return (
-      <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        {bubbles.map((bubble) => (
-          <div
-            key={bubble.id}
-            className="absolute rounded-full opacity-15"
-            style={{
-              width: `${bubble.size}px`,
-              height: `${bubble.size}px`,
-              left: `${bubble.left}%`,
-              background: `linear-gradient(45deg, #6b21a8, #a21caf, #be185d)`,
-              animation: `float ${bubble.duration}s infinite linear`,
-              animationDelay: `${bubble.delay}s`,
-            }}
-          />
-        ))}
-        <style jsx>{`
-          @keyframes float {
-            0% {
-              transform: translateY(100vh) rotate(0deg);
-              opacity: 0;
-            }
-            10% {
-              opacity: 0.15;
-            }
-            90% {
-              opacity: 0.15;
-            }
-            100% {
-              transform: translateY(-100px) rotate(360deg);
-              opacity: 0;
-            }
-          }
-        `}</style>
-      </div>
-    );
-  };
-
   return (
-    <div className="min-h-screen bg-white relative">
-      <FloatingBubbles />
+    <div className="min-h-screen bg-white">
       <NotificationPanel />
       
-      <div className={`p-3 sm:p-6 relative z-10 transition-all duration-300 ${
+      <div className={`p-3 sm:p-6 transition-all duration-300 ${
         isNotificationPanelOpen ? 'lg:mr-96' : ''
       }`}>
         <div className="max-w-7xl mx-auto">

@@ -1,6 +1,6 @@
-import React, { useState, useCallback, memo } from 'react';
+import  { useState, useCallback, memo } from 'react';
 import { Edit3, MapPin, Mail, Phone, Calendar, Award, Briefcase, GraduationCap, User, Link, Plus, X } from 'lucide-react';
-
+import { useAuthstore } from '../store/useAuthstore'
 // Move InputField component outside and memoize it
 const InputField = memo(({ label, value, onChange, type = "text", placeholder = "" }) => (
   <div className="mb-4">
@@ -38,6 +38,12 @@ const ProfileSection = memo(({ title, icon: Icon, children }) => (
 
 const UserProfile = () => {
   const [isEditing, setIsEditing] = useState(false);
+
+  // Mock username from signup - in your actual app, this would come from the auth store
+  // You can replace this with: const { userName } = useAuthstore(); 
+  const { userName } = useAuthstore();
+  
+
   const [profile, setProfile] = useState({
     personalInfo: {
       firstName: '',
@@ -143,7 +149,7 @@ const UserProfile = () => {
     <div className="min-h-screen" style={{ backgroundColor: '#ffffff' }}>
       <div className="flex">
         {/* Side Panel */}
-        <div className="w-64 fixed h-full overflow-y-auto" style={{ 
+        <div className="w-64 fixed h-full overflow-y-auto" style={{
           background: 'linear-gradient(135deg, #620080 0%, #5a007a 25%, #4b0066 75%, #3d0052 100%)',
           boxShadow: '4px 0 15px rgba(139, 69, 19, 0.2)'
         }}>
@@ -157,10 +163,10 @@ const UserProfile = () => {
                   <User size={24} className="text-purple-800" />
                 )}
               </div>
+              {/* Display username from signup instead of full name */}
+
               <h3 className="font-semibold text-white text-sm">
-                {profile.personalInfo.firstName || profile.personalInfo.lastName 
-                  ? `${profile.personalInfo.firstName || ''} ${profile.personalInfo.lastName || ''}`.trim()
-                  : 'Your Name'}
+                @{userName || 'username'}
               </h3>
               <p className="text-purple-200 text-xs mt-1">
                 {profile.preferences.desiredRole || 'Your Role'}
@@ -198,7 +204,7 @@ const UserProfile = () => {
               className="w-full bg-purple-200 text-purple-900 px-4 py-2 rounded-lg hover:bg-purple-100 transition-colors flex items-center justify-center text-sm font-medium"
               style={{ boxShadow: '0 6px 16px rgba(139, 69, 19, 0.15)' }}
             >
-              <Edit3 size={14} className="mr-2" />  
+              <Edit3 size={14} className="mr-2" />
               {isEditing ? 'Save Profile' : 'Edit Profile'}
             </button>
           </div>
@@ -208,7 +214,7 @@ const UserProfile = () => {
         <div className="flex-1 ml-64 p-6">
           <div className="max-w-4xl mx-auto">
             {/* Header */}
-            <div className="rounded-lg p-6 mb-6" style={{ 
+            <div className="rounded-lg p-6 mb-6" style={{
               background: 'linear-gradient(135deg, #620080 0%, #5a007a 25%, #4b0066 75%, #3d0052 100%)',
               boxShadow: '0 12px 32px rgba(139, 69, 19, 0.2), 0 6px 16px rgba(139, 69, 19, 0.1)'
             }}>
@@ -224,7 +230,7 @@ const UserProfile = () => {
                     </span>
                   ) : (
                     <span className="bg-green-200 text-green-800 px-3 py-1 rounded-full" style={{ boxShadow: '0 4px 12px rgba(139, 69, 19, 0.15)' }}>
-                       View Mode
+                      View Mode
                     </span>
                   )}
                 </div>
@@ -602,10 +608,10 @@ const UserProfile = () => {
                           <p className="text-gray-700 mt-1">{project.description}</p>
                           <p className="text-purple-600 mt-1">Technologies: {project.technologies}</p>
                           {project.link && (
-                            <a 
-                              href={project.link} 
-                              className="text-purple-600 hover:underline mt-1 inline-block" 
-                              target="_blank" 
+                            <a
+                              href={project.link}
+                              className="text-purple-600 hover:underline mt-1 inline-block"
+                              target="_blank"
                               rel="noopener noreferrer"
                             >
                               View Project →
@@ -701,7 +707,7 @@ const UserProfile = () => {
               </ProfileSection>
             </div>
 
-           
+
             {/* Preferences */}
             <div id="preferences">
               <ProfileSection title="Internship Preferences" icon={Briefcase}>
