@@ -1,6 +1,5 @@
 import { create } from 'zustand';
 import { axiosInstance } from '../lib/axios';
-import toast from '../components/Toast';
 
 export const useAuthstore = create((set, get) => ({
   phase: 'email',
@@ -14,6 +13,7 @@ export const useAuthstore = create((set, get) => ({
   userName: '',
   password: '',
   verifyToken: '',
+  resetToken: '',
   currentStage: 1,
 
   setEmail: (val) => set({ email: val, emailError: false }),
@@ -84,11 +84,10 @@ export const useAuthstore = create((set, get) => ({
     }
   },
 
-  handleSignupPhase: async (navigate,toast) => {
+   handleSignupPhase: async (navigate,toast) => {
     const { email, userName, password, verifyToken } = get();
     const errors = {};
     let hasErr = false;
-
     if (!userName) {
       errors.userName = true;
       hasErr = true;
@@ -101,82 +100,119 @@ export const useAuthstore = create((set, get) => ({
       set({ credentialsError: errors });
       return;
     }
-
     set({ loading: true });
     try {
-      const res = await axiosInstance.post('/api/authUsers/register',{
+      const res = await axiosInstance.post('/api/authUsers/register', {
         email: email.trim().toLowerCase(),
         userName,
         password,
         verifyToken,
-      });
-      if(res.status===401) toast.error(res.data.message)
-      else if (res.status === 201 && res.data.success) {
-        toast.success(res.data.message || "Registration successful!");
-        setTimeout(() => navigate("/"), 1300);
-      } else {
-        toast.error(res.data.message || "Signup failed.");
-      }
-    } catch (error) {
-      const msg = error.response?.data?.message?.toLowerCase() || "";
-      if (/user.?name/.test(msg)) {
+      });    
+      console.log(res);
+    const success = res?.data?.success;
+    const message = res?.data?.message;
+
+    if (res?.status === 201 && success) {
+      toast.success(message || "Registration successful!");
+      setTimeout(() => navigate("/userHomePage"), 1300);
+    } else {
+      toast.error(message || "Signup failed.");
+    }
+
+  } catch (error) {
+    console.error("Signup error object:", error);
+
+    const errorMsg =
+      error?.response?.data?.message ||
+      error?.response?.data?.error ||  // fallback
+      "Server error.";
+
+    toast?.error(errorMsg);
+
+    // Optional: Custom error triggers
+    if (typeof errorMsg === "string") {
+      const msg = errorMsg.toLowerCase();
+      if (/user.?name/.test(msg) || /password/.test(msg)) {
         get().triggerShake("credentialsError");
-      } else if (/password/.test(msg)) {
-        get().triggerShake("credentialsError");
-      } else {
-        console.log(error.message);
-        toast.error(msg || "Server error.");
       }
-    } finally {
+    }
+}
+finally {
       set({ loading: false });
     }
+
   },
 
   isGmail: (val) => /^[a-zA-Z0-9._%+-]+@gmail\.com$/.test(val),
   //login page authentication
-handleLogin: async (formData) => {
+handleLogin: async (formData, navigate, toast) => {
   try {
     const res = await axiosInstance.post('/api/authUsers/login', formData);
-    if (res.data.success) {
-      toast.success(res.data.message || "Login successful!");
-      localStorage.setItem("user", JSON.stringify(res.data.user));
-      set({ user: res.data.user });
-      setTimeout(() => navigate("/"), 1300);
+    console.log("Full Login Response:", res);
+
+    const user = res?.data?.user;
+    const message = res?.data?.message;
+
+    if (res.status === 200 && user) {
+      localStorage.setItem("user", JSON.stringify(user));
+      set({ user });
+      toast.success(message || "Login successful!");
+      setTimeout(() => navigate("/userHomePage"), 700);
     } else {
-      toast.error(res.data.message || "Login failed.");
+      toast.error(message || "Login failed.");
     }
+
   } catch (err) {
-    const status = err.response?.status;
-    const message = err.response?.data?.message || "Server error.";
-    if (status === 401) {
-      toast.error(message|| "Unauthorized access.");
-    } else {
-      toast.error(message);
-    }  
-  }
-},
-handleForgotpassword: async (payload, toast) => {
-  set({ loading: true });
-  try {
-    const res = await axiosInstance.post('/api/authUsers/forgot-password', payload);
-    const { status, data } = res;
-    console.log(data);
-    if (status === 200 && data.success) {
-      console.log("Response Data:", data);
-      toast.success(data.message);
-      if (data.resetToken) {
-        set({ verifyToken: data.resetToken });
-      }
-      set((state) => ({ currentStage: state.currentStage + 1 }));
-    } else if ([400, 401, 404, 410].includes(status)) {
-      toast.error(data.message);
-    }
-  } catch (error) {
-    console.error("Error in handleForgotpassword:", error);
-    const msg = error?.response?.data?.message;
-    toast.error(msg);
+    console.log("Login Error:", err);
+    const message =
+      err?.response?.data?.message ??
+      err?.message ??
+      "Something went wrong. Please try again.";
+    toast.error(message);
   } finally {
     set({ loading: false });
   }
-} 
+},
+
+
+handleForgotpassword: async (payload, toast) => {
+  set({ loading: true });
+  try {
+    let apiPayload = {};
+    // Email only (Stage 1)
+    if (payload.email && !payload.otp && !payload.newPassword) {
+      apiPayload = { email: payload.email };
+    }
+    // Email + OTP (Stage 2)
+    else if (payload.email && payload.otp) {
+      apiPayload = { email: payload.email, otp: payload.otp };
+    }
+    // Reset password (Stage 3)
+    else if (payload.email && payload.newPassword && payload.resetToken) {
+      apiPayload = {
+        email: payload.email,
+        newPassword: payload.newPassword,
+        resetToken: payload.resetToken,
+      };
+    }
+    console.log("API Payload:", apiPayload);
+    const res = await axiosInstance.post('/api/authUsers/forgot-password', apiPayload);
+    if (res.status === 200 && res.data.success) {
+      toast.success(res.data.message);
+       if (res.data.resetToken) {
+        set({ resetToken: res.data.resetToken });
+       }
+        set((state) => ({ currentStage: state.currentStage + 1 }));
+      }
+    else {
+      toast.error(res.data.message);
+      return;
+    }
+  } catch (err) {
+    toast.error(err.response?.data?.messag);
+  } finally {
+    set({ loading: false });
+  }
+},
+
 }));

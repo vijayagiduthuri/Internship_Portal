@@ -693,5 +693,4 @@ const UserHomePage = () => {
     </div>
   );
 };
-
 export default UserHomePage;

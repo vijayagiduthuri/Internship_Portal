@@ -11,12 +11,15 @@ const ForgotPasswordPage = () => {
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [errors, setErrors] = useState({});
+const [errors, setErrors] = useState({
+  newPassword: null,
+  confirmPassword: null,
+});
   const [showSuccess, setShowSuccess] = useState(false);
-  const payloadRef = useRef({});
   const otpRefs = useRef([]);
-
-const {isGmail , handleForgotpassword , verifyToken,currentStage} = useAuthstore()
+  const newpasswordInputRef = useRef(null);
+  const confirmpasswordInputRef = useRef(null);
+const {isGmail , handleForgotpassword , resetToken,currentStage,setCurrentStage} = useAuthstore()
 
 const handleGetOTP = async () => {
   if (!isGmail(email)) {
@@ -27,8 +30,7 @@ const handleGetOTP = async () => {
   setLoading(true);
   try {
     let payload = { email: email.trim().toLowerCase() };
-    payloadRef.current = payload;
-    await handleForgotpassword(payloadRef.current, toast);
+    await handleForgotpassword(payload, toast);
     setTimeout(() => otpRefs.current[0]?.focus(), 100);
   } catch (error) {
     toast.error(error);
@@ -70,19 +72,16 @@ const handleGetOTP = async () => {
 
   const handleVerifyOTP = async () => {
     const otpString = otp.join('');
-    console.log(otpString.length);
     if (otpString.length !== 6) {
       setErrors({ otp: 'Please enter a valid 6-digit OTP' });
       return;
     }
-      payloadRef.current = {
-        ...payloadRef.current,
-        otp: otpString,
-      };
+      const payload = {
+        email: email.trim().toLowerCase(),
+        otp: otpString,}
   setLoading(true);
   try {
-    await handleForgotpassword(payloadRef.current,toast);
-    updateStage(3);
+    await handleForgotpassword(payload,toast);
   } catch (err) {
     toast.error("OTP verification failed.");
   } finally {
@@ -103,14 +102,14 @@ const handleGetOTP = async () => {
       return;
     }
       setErrors({});
-        payloadRef.current = {
-          ...payloadRef.current,
-            resetToken: verifyToken,
-          newPassword: newPassword,
-        };
+        const payload = {
+        email: email.trim().toLowerCase(),
+        newPassword :newPassword,
+        resetToken: resetToken,
+      };
       setLoading(true);
       try {
-        await handleForgotpassword( payloadRef.current,toast);
+        await handleForgotpassword( payload,toast);
         setShowSuccess(true);
       } catch (err) {
         toast.error("Password reset failed.");
@@ -129,15 +128,17 @@ const handleGetOTP = async () => {
 useEffect(() => {
   const handleKeyDown = (e) => {
     if (e.key === "Enter") {
-      if (currentStage === 1) handleGetOTP();
-      else if (currentStage === 2) handleVerifyOTP();
-      else if (currentStage === 3) handleSavePassword();
+      if (currentStage === 1) {
+        handleGetOTP();
+      } else if (currentStage === 2) {
+        handleVerifyOTP();
+      }
     }
   };
-
   window.addEventListener("keydown", handleKeyDown);
   return () => window.removeEventListener("keydown", handleKeyDown);
-}, [currentStage]); 
+}, [currentStage, handleGetOTP, handleVerifyOTP]);
+
 
   const getSubtitle = () => {
     switch (currentStage) {
@@ -390,6 +391,18 @@ useEffect(() => {
                   type={showNewPassword ? "text" : "password"}
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      if (newPassword.length < 6) {
+                        setErrors((prev) => ({...prev,newPassword: "Password must be at least 6 characters long"}));
+                      } else {
+                        setErrors((prev) => ({  ...prev, newPassword: null, }));
+                        confirmpasswordInputRef.current?.focus();
+                      }
+                    }
+                  }}
+                  ref={newpasswordInputRef}
                   className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
                   placeholder="Enter new password"
                   disabled={loading}
@@ -398,10 +411,12 @@ useEffect(() => {
                   isVisible={showNewPassword} 
                   onClick={() => setShowNewPassword(!showNewPassword)} 
                 />
-              </div>
-              {errors.newPassword && (
-                <p className="text-red-500 text-sm mt-2 animate-fade-in">{errors.newPassword}</p>
-              )}
+                {errors.newPassword && (
+                  <p className="text-red-500 text-sm mt-2 animate-fade-in">
+                    {errors.newPassword}
+                  </p>
+                )}
+            </div>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -411,7 +426,20 @@ useEffect(() => {
                 <input
                   type={showConfirmPassword ? "text" : "password"}
                   value={confirmPassword}
+                  ref={confirmpasswordInputRef}
                   onChange={(e) => setConfirmPassword(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      if (confirmPassword !== newPassword) {
+                        setErrors((prev) => ({...prev,confirmPassword: "Passwords do not match"}));
+                      }
+                      else {
+                        setErrors((prev) => ({...prev, confirmPassword: null }));
+                      handleSavePassword();
+                      }
+                    }
+                  }}
                   className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
                   placeholder="Confirm new password"
                   disabled={loading}

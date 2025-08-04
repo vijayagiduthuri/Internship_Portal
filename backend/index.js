@@ -7,6 +7,8 @@ import authCompanyRoutes from "./src/routes/authCompanyRoutes/authCompanyRoutes.
 import internshipRoutes from "./src/routes/internshipRoutes/internshipRoutes.js";
 import profileRoutes from "./src/routes/profileRoutes/profileRoutes.js";
 import recruiterRoutes from "./src/routes/authRecruiterRoutes/authRecruiterRoutes.js";
+// Remove Debug Reoutes during Production
+import debugRoutes from "./src/routes/debugRoutes/debugRoutes.js"
 import { connectDB } from "./src/lib/db.js";
 
 // Load environment variables
@@ -36,6 +38,10 @@ app.use("/api/internships", internshipRoutes);
 app.use("/api/profile", profileRoutes);
 app.use("/api/authRecruiters", recruiterRoutes);
 
+// Debug Route
+if (process.env.DEBUG_ROUTES === 'true') {
+  app.use("/api/debug",debugRoutes); // Mounts all debug routes
+}
 // Set the port from environment variable or default to 9000
 const PORT = process.env.PORT || 9000;
 

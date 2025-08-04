@@ -4,6 +4,7 @@ import toast from '../components/Toast';
 import { useAuthstore } from '../store/useAuthstore';
 
 export default function Login() {
+  const navigate = useNavigate();
   const {handleLogin ,triggerShake} = useAuthstore();
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -34,9 +35,15 @@ const   isGmail =  (val) => /^[a-zA-Z0-9._%+-]+@gmail\.com$/.test(val);
     }
     return true;
   };
-const handleSubmit = () => {
+const handleSubmit = async () => {
   if (validateForm()) {
-    handleLogin(formData);
+    setLoading(true);
+    try{
+    await handleLogin(formData,navigate,toast);
+    setLoading(false);
+    } catch (error) {
+      toast.error(error.message|| 'Login failed. Please try again.');
+    }
   }
 };
 
