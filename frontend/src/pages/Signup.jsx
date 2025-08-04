@@ -101,7 +101,7 @@ const handleOtpPaste = (e) => {
 };
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row relative">
+    <div className="min-h-screen flex flex-col lg:flex-row relative overflow-hidden">
       {/* Left Panel - Welcome Section with Smooth Single Curved Right Edge */}
       <div 
         className="w-full lg:w-3/5 flex flex-col justify-center items-center p-4 sm:p-6 lg:p-8 relative overflow-hidden min-h-[300px] sm:min-h-[400px] lg:min-h-screen order-1 lg:order-1" 
@@ -110,7 +110,8 @@ const handleOtpPaste = (e) => {
           clipPath: 'ellipse(100% 160% at 0% 50%)'
         }}
       >
-        <div className="text-center z-10 mb-4 sm:mb-6">
+        {/* Moved text content down with additional margin-top */}
+        <div className="text-center z-10 mb-4 sm:mb-6 mt-16 sm:mt-20 lg:mt-10">
           <h1 className="text-white text-3xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold mb-2 sm:mb-3 animate-pulse">
             Welcome to
           </h1>
@@ -161,11 +162,12 @@ const handleOtpPaste = (e) => {
             {phase === "email" && (
               <>
                 <div>
-                  <label className="block text-gray-700 text-sm mb-2">Gmail</label>
+                  <label className="block text-gray-700 text-sm mb-2">Email</label>
                   <div className="relative">
                     <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+                      {/* Changed from @ icon to user profile icon */}
                       <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                       </svg>
                     </div>
                     <input
@@ -359,6 +361,26 @@ const handleOtpPaste = (e) => {
           .w-full.lg\\:w-3\\/5:first-child {
             clip-path: none !important;
           }
+        }
+
+        /* Prevent body scroll and hide scrollbars */
+        body {
+          overflow: hidden;
+        }
+        
+        /* Hide scrollbars for webkit browsers */
+        ::-webkit-scrollbar {
+          display: none;
+        }
+        
+        /* Hide scrollbars for Firefox */
+        html {
+          scrollbar-width: none;
+        }
+        
+        /* Hide scrollbars for IE and Edge */
+        body {
+          -ms-overflow-style: none;
         }
       `}</style>
     </div>

@@ -111,6 +111,10 @@ const CompanyRegistration = () => {
     setCurrentStep(prev => Math.max(prev - 1, 1));
   };
 
+  const closeSuccessPopup = () => {
+    setSuccess(false);
+  };
+
   const onSubmit = async () => {
     if (!validateCurrentStep()) return;
 
@@ -119,7 +123,6 @@ const CompanyRegistration = () => {
       await new Promise(resolve => setTimeout(resolve, 2000));
       console.log('Company registered:', formData);
       setSuccess(true);
-      setTimeout(() => setSuccess(false), 3000);
     } catch (error) {
       console.error('Registration failed:', error);
     } finally {
@@ -131,57 +134,60 @@ const CompanyRegistration = () => {
     switch (currentStep) {
       case 1:
         return (
-          <div className="space-y-4">
-            <h3 className="text-xl font-semibold mb-6 flex items-center" style={{ color: '#620080' }}>
-              
-              Basic Company Information
-            </h3>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              <div>
-                <input
-                  name="companyName"
-                  value={formData.companyName}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:border-transparent placeholder-gray-400"
-                  style={{ '--tw-ring-color': '#620080' }}
-                  placeholder="Company Name *"
-                />
-                {errors.companyName && <p className="text-red-500 text-sm mt-1">{errors.companyName}</p>}
-              </div>
-              <div>
-                <input
-                  name="companyEmail"
-                  type="email"
-                  value={formData.companyEmail}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:border-transparent placeholder-gray-400"
-                  style={{ '--tw-ring-color': '#620080' }}
-                  placeholder="Company Email *"
-                />
-                {errors.companyEmail && <p className="text-red-500 text-sm mt-1">{errors.companyEmail}</p>}
-              </div>
-              <div>
-                <input
-                  name="companyPhone"
-                  type="tel"
-                  value={formData.companyPhone}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:border-transparent placeholder-gray-400"
-                  style={{ '--tw-ring-color': '#620080' }}
-                  placeholder="Company Phone *"
-                />
-                {errors.companyPhone && <p className="text-red-500 text-sm mt-1">{errors.companyPhone}</p>}
-              </div>
-              <div>
-                <input
-                  name="website"
-                  value={formData.website}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:border-transparent placeholder-gray-400"
-                  style={{ '--tw-ring-color': '#620080' }}
-                  placeholder="Website URL *"
-                />
-                {errors.website && <p className="text-red-500 text-sm mt-1">{errors.website}</p>}
+          <div className="space-y-6">
+            <div className="rounded-lg p-4 mb-6" style={{ background: 'linear-gradient(135deg, #620080 0%, #5a007a 100%)' }}>
+              <h3 className="text-xl font-semibold text-white flex items-center">
+                Basic Company Information
+              </h3>
+            </div>
+            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <div>
+                  <input
+                    name="companyName"
+                    value={formData.companyName}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:border-transparent placeholder-gray-400"
+                    style={{ '--tw-ring-color': '#620080' }}
+                    placeholder="Company Name *"
+                  />
+                  {errors.companyName && <p className="text-red-500 text-sm mt-1">{errors.companyName}</p>}
+                </div>
+                <div>
+                  <input
+                    name="companyEmail"
+                    type="email"
+                    value={formData.companyEmail}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:border-transparent placeholder-gray-400"
+                    style={{ '--tw-ring-color': '#620080' }}
+                    placeholder="Company Email *"
+                  />
+                  {errors.companyEmail && <p className="text-red-500 text-sm mt-1">{errors.companyEmail}</p>}
+                </div>
+                <div>
+                  <input
+                    name="companyPhone"
+                    type="tel"
+                    value={formData.companyPhone}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:border-transparent placeholder-gray-400"
+                    style={{ '--tw-ring-color': '#620080' }}
+                    placeholder="Company Phone *"
+                  />
+                  {errors.companyPhone && <p className="text-red-500 text-sm mt-1">{errors.companyPhone}</p>}
+                </div>
+                <div>
+                  <input
+                    name="website"
+                    value={formData.website}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:border-transparent placeholder-gray-400"
+                    style={{ '--tw-ring-color': '#620080' }}
+                    placeholder="Website URL *"
+                  />
+                  {errors.website && <p className="text-red-500 text-sm mt-1">{errors.website}</p>}
+                </div>
               </div>
             </div>
           </div>
@@ -189,83 +195,86 @@ const CompanyRegistration = () => {
       
       case 2:
         return (
-          <div className="space-y-4">
-            <h3 className="text-xl font-semibold mb-6 flex items-center" style={{ color: '#620080' }}>
-              
-              Legal & Business Details
-            </h3>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              <div>
-                <input
-                  name="gst"
-                  value={formData.gst}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:border-transparent placeholder-gray-400"
-                  style={{ '--tw-ring-color': '#620080' }}
-                  placeholder="GST Number *"
-                />
-                {errors.gst && <p className="text-red-500 text-sm mt-1">{errors.gst}</p>}
-              </div>
-              <div>
-                <input
-                  name="cin"
-                  value={formData.cin}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:border-transparent placeholder-gray-400"
-                  style={{ '--tw-ring-color': '#620080' }}
-                  placeholder="CIN Number *"
-                />
-                {errors.cin && <p className="text-red-500 text-sm mt-1">{errors.cin}</p>}
-              </div>
-              <div>
-                <select
-                  name="companySize"
-                  value={formData.companySize}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:border-transparent text-gray-700"
-                  style={{ '--tw-ring-color': '#620080' }}
-                >
-                  <option value="">Select Company Size *</option>
-                  <option value="1-10">1-10 employees</option>
-                  <option value="11-50">11-50 employees</option>
-                  <option value="51-200">51-200 employees</option>
-                  <option value="201+">201+ employees</option>
-                </select>
-                {errors.companySize && <p className="text-red-500 text-sm mt-1">{errors.companySize}</p>}
-              </div>
-              <div>
-                <input
-                  name="industry"
-                  value={formData.industry}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:border-transparent placeholder-gray-400"
-                  style={{ '--tw-ring-color': '#620080' }}
-                  placeholder="Industry *"
-                />
-                {errors.industry && <p className="text-red-500 text-sm mt-1">{errors.industry}</p>}
-              </div>
-              <div>
-                <input
-                  name="headquarters"
-                  value={formData.headquarters}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:border-transparent placeholder-gray-400"
-                  style={{ '--tw-ring-color': '#620080' }}
-                  placeholder="Headquarters *"
-                />
-                {errors.headquarters && <p className="text-red-500 text-sm mt-1">{errors.headquarters}</p>}
-              </div>
-              <div>
-                <input
-                  name="foundedYear"
-                  type="number"
-                  value={formData.foundedYear}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:border-transparent placeholder-gray-400"
-                  style={{ '--tw-ring-color': '#620080' }}
-                  placeholder="Founded Year *"
-                />
-                {errors.foundedYear && <p className="text-red-500 text-sm mt-1">{errors.foundedYear}</p>}
+          <div className="space-y-6">
+            <div className="rounded-lg p-4 mb-6" style={{ background: 'linear-gradient(135deg, #620080 0%, #5a007a 100%)' }}>
+              <h3 className="text-xl font-semibold text-white flex items-center">
+                Legal & Business Details
+              </h3>
+            </div>
+            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <div>
+                  <input
+                    name="gst"
+                    value={formData.gst}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:border-transparent placeholder-gray-400"
+                    style={{ '--tw-ring-color': '#620080' }}
+                    placeholder="GST Number *"
+                  />
+                  {errors.gst && <p className="text-red-500 text-sm mt-1">{errors.gst}</p>}
+                </div>
+                <div>
+                  <input
+                    name="cin"
+                    value={formData.cin}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:border-transparent placeholder-gray-400"
+                    style={{ '--tw-ring-color': '#620080' }}
+                    placeholder="CIN Number *"
+                  />
+                  {errors.cin && <p className="text-red-500 text-sm mt-1">{errors.cin}</p>}
+                </div>
+                <div>
+                  <select
+                    name="companySize"
+                    value={formData.companySize}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:border-transparent text-gray-700"
+                    style={{ '--tw-ring-color': '#620080' }}
+                  >
+                    <option value="">Select Company Size *</option>
+                    <option value="1-10">1-10 employees</option>
+                    <option value="11-50">11-50 employees</option>
+                    <option value="51-200">51-200 employees</option>
+                    <option value="201+">201+ employees</option>
+                  </select>
+                  {errors.companySize && <p className="text-red-500 text-sm mt-1">{errors.companySize}</p>}
+                </div>
+                <div>
+                  <input
+                    name="industry"
+                    value={formData.industry}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:border-transparent placeholder-gray-400"
+                    style={{ '--tw-ring-color': '#620080' }}
+                    placeholder="Industry *"
+                  />
+                  {errors.industry && <p className="text-red-500 text-sm mt-1">{errors.industry}</p>}
+                </div>
+                <div>
+                  <input
+                    name="headquarters"
+                    value={formData.headquarters}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:border-transparent placeholder-gray-400"
+                    style={{ '--tw-ring-color': '#620080' }}
+                    placeholder="Headquarters *"
+                  />
+                  {errors.headquarters && <p className="text-red-500 text-sm mt-1">{errors.headquarters}</p>}
+                </div>
+                <div>
+                  <input
+                    name="foundedYear"
+                    type="number"
+                    value={formData.foundedYear}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:border-transparent placeholder-gray-400"
+                    style={{ '--tw-ring-color': '#620080' }}
+                    placeholder="Founded Year *"
+                  />
+                  {errors.foundedYear && <p className="text-red-500 text-sm mt-1">{errors.foundedYear}</p>}
+                </div>
               </div>
             </div>
           </div>
@@ -273,109 +282,118 @@ const CompanyRegistration = () => {
       
       case 3:
         return (
-          <div className="space-y-4">
-            <h3 className="text-xl font-semibold mb-6 flex items-center" style={{ color: '#620080' }}>
-              
-              Company Logo
-            </h3>
-            <div className="border-2 border-dashed rounded-lg p-12 text-center hover:border-opacity-60 transition-colors bg-white" style={{ borderColor: '#bf80d9' }}>
-              <input
-                type="file"
-                onChange={handleLogoUpload}
-                className="hidden"
-                id="logo-upload"
-                accept="image/*"
-              />
-              <label htmlFor="logo-upload" className="cursor-pointer">
-                <div className="mb-4" style={{ color: '#a300d6' }}>
-                  <svg className="mx-auto h-20 w-20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                  </svg>
-                </div>
-                <p className="text-xl text-gray-700 font-semibold mb-2">
-                  {formData.logo ? formData.logo.name : 'Upload Company Logo'}
-                </p>
-                <p className="text-sm text-gray-500">Click to upload or drag and drop</p>
-                <p className="text-xs text-gray-400 mt-1">PNG, JPG, GIF up to 10MB</p>
-              </label>
+          <div className="space-y-6">
+            <div className="rounded-lg p-4 mb-6" style={{ background: 'linear-gradient(135deg, #620080 0%, #5a007a 100%)' }}>
+              <h3 className="text-xl font-semibold text-white flex items-center">
+                Company Logo
+              </h3>
             </div>
-            {errors.logo && <p className="text-red-500 text-sm mt-2">{errors.logo}</p>}
+            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+              <div className="border-2 border-dashed rounded-lg p-12 text-center hover:border-opacity-60 transition-colors" style={{ borderColor: '#bf80d9' }}>
+                <input
+                  type="file"
+                  onChange={handleLogoUpload}
+                  className="hidden"
+                  id="logo-upload"
+                  accept="image/*"
+                />
+                <label htmlFor="logo-upload" className="cursor-pointer">
+                  <div className="mb-4" style={{ color: '#a300d6' }}>
+                    <svg className="mx-auto h-20 w-20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                    </svg>
+                  </div>
+                  <p className="text-xl text-gray-700 font-semibold mb-2">
+                    {formData.logo ? formData.logo.name : 'Upload Company Logo'}
+                  </p>
+                  <p className="text-sm text-gray-500">Click to upload or drag and drop</p>
+                  <p className="text-xs text-gray-400 mt-1">PNG, JPG, GIF up to 10MB</p>
+                </label>
+              </div>
+              {errors.logo && <p className="text-red-500 text-sm mt-2">{errors.logo}</p>}
+            </div>
           </div>
         );
       
       case 4:
         return (
-          <div className="space-y-4">
-            <h3 className="text-xl font-semibold mb-6 flex items-center" style={{ color: '#620080' }}>
-              
-              Company Description
-            </h3>
-            <textarea
-              name="description"
-              value={formData.description}
-              onChange={handleInputChange}
-              className="w-full px-4 py-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:border-transparent placeholder-gray-400"
-              style={{ '--tw-ring-color': '#620080' }}
-              placeholder="Tell us about your company... *"
-              rows="6"
-            />
-            {errors.description && <p className="text-red-500 text-sm mt-1">{errors.description}</p>}
+          <div className="space-y-6">
+            <div className="rounded-lg p-4 mb-6" style={{ background: 'linear-gradient(135deg, #620080 0%, #5a007a 100%)' }}>
+              <h3 className="text-xl font-semibold text-white flex items-center">
+                Company Description
+              </h3>
+            </div>
+            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+              <textarea
+                name="description"
+                value={formData.description}
+                onChange={handleInputChange}
+                className="w-full px-4 py-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:border-transparent placeholder-gray-400"
+                style={{ '--tw-ring-color': '#620080' }}
+                placeholder="Tell us about your company... *"
+                rows="6"
+              />
+              {errors.description && <p className="text-red-500 text-sm mt-1">{errors.description}</p>}
+            </div>
           </div>
         );
       
       case 5:
         return (
-          <div className="space-y-4">
-            <h3 className="text-xl font-semibold mb-6 flex items-center" style={{ color: '#620080' }}>
-              
-              HR Contact & Social Links
-            </h3>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              <div>
-                <input
-                  name="hrContactName"
-                  value={formData.hrContactName}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:border-transparent placeholder-gray-400"
-                  style={{ '--tw-ring-color': '#620080' }}
-                  placeholder="HR Contact Name *"
-                />
-                {errors.hrContactName && <p className="text-red-500 text-sm mt-1">{errors.hrContactName}</p>}
-              </div>
-              <div>
-                <input
-                  name="hrContactEmail"
-                  type="email"
-                  value={formData.hrContactEmail}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:border-transparent placeholder-gray-400"
-                  style={{ '--tw-ring-color': '#620080' }}
-                  placeholder="HR Contact Email *"
-                />
-                {errors.hrContactEmail && <p className="text-red-500 text-sm mt-1">{errors.hrContactEmail}</p>}
-              </div>
-              <div>
-                <input
-                  name="hrContactPhone"
-                  type="tel"
-                  value={formData.hrContactPhone}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:border-transparent placeholder-gray-400"
-                  style={{ '--tw-ring-color': '#620080' }}
-                  placeholder="HR Contact Phone *"
-                />
-                {errors.hrContactPhone && <p className="text-red-500 text-sm mt-1">{errors.hrContactPhone}</p>}
-              </div>
-              <div>
-                <input
-                  name="socialLinks"
-                  value={formData.socialLinks}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:border-transparent placeholder-gray-400"
-                  style={{ '--tw-ring-color': '#620080' }}
-                  placeholder="Social Media URL *"
-                />
-                {errors.socialLinks && <p className="text-red-500 text-sm mt-1">{errors.socialLinks}</p>}
+          <div className="space-y-6">
+            <div className="rounded-lg p-4 mb-6" style={{ background: 'linear-gradient(135deg, #620080 0%, #5a007a 100%)' }}>
+              <h3 className="text-xl font-semibold text-white flex items-center">
+                HR Contact & Social Links
+              </h3>
+            </div>
+            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <div>
+                  <input
+                    name="hrContactName"
+                    value={formData.hrContactName}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:border-transparent placeholder-gray-400"
+                    style={{ '--tw-ring-color': '#620080' }}
+                    placeholder="HR Contact Name *"
+                  />
+                  {errors.hrContactName && <p className="text-red-500 text-sm mt-1">{errors.hrContactName}</p>}
+                </div>
+                <div>
+                  <input
+                    name="hrContactEmail"
+                    type="email"
+                    value={formData.hrContactEmail}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:border-transparent placeholder-gray-400"
+                    style={{ '--tw-ring-color': '#620080' }}
+                    placeholder="HR Contact Email *"
+                  />
+                  {errors.hrContactEmail && <p className="text-red-500 text-sm mt-1">{errors.hrContactEmail}</p>}
+                </div>
+                <div>
+                  <input
+                    name="hrContactPhone"
+                    type="tel"
+                    value={formData.hrContactPhone}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:border-transparent placeholder-gray-400"
+                    style={{ '--tw-ring-color': '#620080' }}
+                    placeholder="HR Contact Phone *"
+                  />
+                  {errors.hrContactPhone && <p className="text-red-500 text-sm mt-1">{errors.hrContactPhone}</p>}
+                </div>
+                <div>
+                  <input
+                    name="socialLinks"
+                    value={formData.socialLinks}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:border-transparent placeholder-gray-400"
+                    style={{ '--tw-ring-color': '#620080' }}
+                    placeholder="Social Media URL *"
+                  />
+                  {errors.socialLinks && <p className="text-red-500 text-sm mt-1">{errors.socialLinks}</p>}
+                </div>
               </div>
             </div>
           </div>
@@ -387,26 +405,71 @@ const CompanyRegistration = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-purple-800 to-indigo-900 py-8 px-4" style={{ background: 'linear-gradient(135deg, #620080 0%, #5a007a 25%, #4b0066 75%, #3d0052 100%)' }}>
-      {/* Background Decorative Elements */}
-      <div className="absolute top-10 left-10 w-20 h-20 rounded-full opacity-20 animate-pulse" style={{ backgroundColor: '#8a00b3' }}></div>
-      <div className="absolute top-20 right-16 w-16 h-16 rounded-full opacity-30 animate-bounce" style={{ backgroundColor: '#9900cc' }}></div>
-      <div className="absolute bottom-20 left-20 w-24 h-24 rounded-full opacity-25" style={{ backgroundColor: '#7300a3' }}></div>
+    <div className="min-h-screen bg-white py-8 px-4 relative overflow-hidden">
+      {/* Animated Purple Balls */}
+      <div className="absolute top-10 left-10 w-20 h-20 rounded-full opacity-20 animate-bounce" style={{ backgroundColor: '#8a00b3', animationDelay: '0s', animationDuration: '3s' }}></div>
+      <div className="absolute top-20 right-16 w-16 h-16 rounded-full opacity-30 animate-pulse" style={{ backgroundColor: '#9900cc', animationDelay: '1s', animationDuration: '4s' }}></div>
+      <div className="absolute bottom-20 left-20 w-24 h-24 rounded-full opacity-25 animate-bounce" style={{ backgroundColor: '#7300a3', animationDelay: '2s', animationDuration: '5s' }}></div>
+      <div className="absolute top-1/2 right-10 w-12 h-12 rounded-full opacity-20 animate-pulse" style={{ backgroundColor: '#620080', animationDelay: '3s', animationDuration: '3.5s' }}></div>
+      <div className="absolute bottom-1/3 right-1/3 w-18 h-18 rounded-full opacity-15 animate-bounce" style={{ backgroundColor: '#5a007a', animationDelay: '4s', animationDuration: '6s' }}></div>
+      <div className="absolute top-1/4 left-1/3 w-14 h-14 rounded-full opacity-25 animate-pulse" style={{ backgroundColor: '#a300d6', animationDelay: '2.5s', animationDuration: '4.5s' }}></div>
+
+      {/* Success Popup Modal */}
+      {success && (
+        <div className="fixed inset-0 flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full mx-4 relative border-2" style={{ borderColor: '#ffffff' }}>
+            {/* Close Button */}
+            <button 
+              onClick={closeSuccessPopup}
+              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+            
+            {/* Success Content */}
+            <div className="text-center">
+              {/* Success Icon */}
+              <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <svg className="w-10 h-10 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              
+              {/* Success Message */}
+              <h3 className="text-2xl font-bold text-gray-800 mb-4">Registration Successful!</h3>
+              <p className="text-gray-600 mb-6">
+                Welcome to Internship Portal! Your company has been successfully registered.
+              </p>
+              
+              {/* OK Button */}
+              <button
+                onClick={closeSuccessPopup}
+                className="px-8 py-3 text-white font-semibold rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                style={{ background: 'linear-gradient(135deg, #620080 0%, #5a007a 100%)' }}
+              >
+                Got it!
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Header */}
       <div className="text-center mb-8">
-        <div className="inline-flex items-center justify-center w-16 h-16 bg-white rounded-full shadow-lg mb-6 animate-bounce">
+        <div className="inline-flex items-center justify-center w-16 h-16 bg-white rounded-full shadow-lg mb-6 animate-bounce border-2" style={{ borderColor: '#620080' }}>
           <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 20 20" style={{ color: '#620080' }}>
             <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z"/>
           </svg>
         </div>
-        <h1 className="text-4xl lg:text-4xl font-bold text-white mb-4">Welcome to Internship Portal</h1>
-        <p className="text-purple-200 text-lg mb-6">Register your company and start hiring</p>
+        <h1 className="text-4xl lg:text-4xl font-bold mb-4" style={{ color: '#620080' }}>Welcome to Internship Portal</h1>
+        <p className="text-gray-600 text-lg mb-6">Register your company and start hiring</p>
       </div>
 
       <div className="max-w-7xl mx-auto flex gap-8">
         {/* Step Navigation Sidebar */}
-        <div className="w-80 bg-white rounded-2xl shadow-2xl p-6 h-fit sticky top-8">
+        <div className="w-80 bg-white rounded-2xl shadow-2xl p-6 h-fit sticky top-8 border border-gray-100">
           <h3 className="text-lg font-bold mb-6" style={{ color: '#620080' }}>Registration Steps</h3>
           <div className="space-y-0">
             {steps.map((step, index) => (
@@ -441,7 +504,6 @@ const CompanyRegistration = () => {
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center">
-                    <span className="text-xl mr-2">{step.icon}</span>
                     <div>
                       <p 
                         className={`font-semibold ${
@@ -465,7 +527,7 @@ const CompanyRegistration = () => {
 
         {/* Main Form Container */}
         <div className="flex-1">
-          <div className="bg-white rounded-2xl shadow-2xl p-8 lg:p-12 relative overflow-hidden">
+          <div className="bg-gray-50 rounded-2xl shadow-2xl p-8 lg:p-12 relative overflow-hidden border border-gray-100">
             {/* Form Header Decoration */}
             <div className="absolute top-0 left-0 w-full h-2" style={{ background: 'linear-gradient(90deg, #620080 0%, #7300a3 100%)' }}></div>
             
@@ -485,12 +547,6 @@ const CompanyRegistration = () => {
                 />
               </div>
             </div>
-
-            {success && (
-              <div className="bg-green-100 text-green-700 p-4 rounded-lg text-center mb-6 animate-pulse border border-green-200">
-                Registration successful! Welcome to Internship Portal!
-              </div>
-            )}
 
             {/* Step Content */}
             <div className="mb-8">

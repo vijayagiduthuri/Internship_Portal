@@ -78,10 +78,6 @@ const handleSubmit = async () => {
   const handleForgotPassword = () => {
   window.location.href = '/forgot-password';
 };
-
-const handleSignUp = () => {
-  window.location.href = '/signup';
-};
   return (
     <div className="min-h-screen flex relative overflow-hidden">
       {/* Left Panel - Form */}
@@ -265,7 +261,7 @@ const handleSignUp = () => {
           </p>
         </div>
 
-        <div className="flex-1 w-full flex items-center justify-center z-10 py-4">
+        <div className="w-full flex items-center justify-center z-10 py-4 mt-2 sm:mt-4 lg:mt-6">
           <div
             className="w-48 h-36 sm:w-56 sm:h-40 md:w-64 md:h-48 lg:w-72 lg:h-54 rounded-lg shadow-2xl flex items-center justify-center transform hover:scale-105 lg:hover:scale-110 transition-all duration-300 animate-bounce-gentle"
             style={{
