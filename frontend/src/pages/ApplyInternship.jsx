@@ -1,54 +1,45 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 
-const CompanyRegistration = () => {
+const InternshipApplicationForm = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [formData, setFormData] = useState({
-    companyName: '',
-    companyEmail: '',
-    logo: null,
-    gst: '',
-    cin: '',
-    companySize: '',
-    industry: '',
-    description: '',
-    headquarters: '',
-    website: '',
-    hrContactName: '',
-    hrContactEmail: '',
-    hrContactPhone: '',
-    companyPhone: '',
-    foundedYear: '',
-    socialLinks: ''
+    internshipId: '',
+    fullName: '',
+    email: '',
+    phone: '',
+    education: {
+      college: '',
+      degree: '',
+      branch: '',
+      yearOfPassing: ''
+    },
+    resumeFile: null,
+    coverLetter: ''
   });
   const [errors, setErrors] = useState({});
 
   const steps = [
     { 
       number: 1, 
-      title: 'Basic Info', 
-      fields: ['companyName', 'companyEmail', 'companyPhone', 'website']
+      title: 'Personal Info', 
+      fields: ['fullName', 'email', 'phone']
     },
     { 
       number: 2, 
-      title: 'Legal Details', 
-      fields: ['gst', 'cin', 'companySize', 'industry', 'headquarters', 'foundedYear']
+      title: 'Education Details', 
+      fields: ['education.college', 'education.degree', 'education.branch', 'education.yearOfPassing']
     },
     { 
       number: 3, 
-      title: 'Company Logo', 
-      fields: ['logo']
+      title: 'Resume Upload', 
+      fields: ['resumeFile']
     },
     { 
       number: 4, 
-      title: 'Description', 
-      fields: ['description']
-    },
-    { 
-      number: 5, 
-      title: 'HR Contact & Social', 
-      fields: ['hrContactName', 'hrContactEmail', 'hrContactPhone', 'socialLinks']
+      title: 'Cover Letter', 
+      fields: []
     }
   ];
 
@@ -57,12 +48,30 @@ const CompanyRegistration = () => {
     const currentStepFields = steps[currentStep - 1].fields;
     
     currentStepFields.forEach(field => {
-      if (!formData[field]) {
-        newErrors[field] = `${field.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())} is required`;
-      } else if (field.includes('Email') && !/\S+@\S+\.\S+/.test(formData[field])) {
-        newErrors[field] = 'Invalid email';
-      } else if (field.includes('Phone') && !/^[0-9]{10}$/.test(formData[field])) {
-        newErrors[field] = 'Phone must be 10 digits';
+      if (field === 'fullName' && !formData.fullName) {
+        newErrors.fullName = 'Full name is required';
+      } else if (field === 'email') {
+        if (!formData.email) {
+          newErrors.email = 'Email is required';
+        } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+          newErrors.email = 'Invalid email';
+        }
+      } else if (field === 'phone') {
+        if (!formData.phone) {
+          newErrors.phone = 'Phone is required';
+        } else if (!/^[0-9]{10}$/.test(formData.phone)) {
+          newErrors.phone = 'Phone must be 10 digits';
+        }
+      } else if (field === 'education.college' && !formData.education.college) {
+        newErrors['education.college'] = 'College is required';
+      } else if (field === 'education.degree' && !formData.education.degree) {
+        newErrors['education.degree'] = 'Degree is required';
+      } else if (field === 'education.branch' && !formData.education.branch) {
+        newErrors['education.branch'] = 'Branch is required';
+      } else if (field === 'education.yearOfPassing' && !formData.education.yearOfPassing) {
+        newErrors['education.yearOfPassing'] = 'Year of passing is required';
+      } else if (field === 'resumeFile' && !formData.resumeFile) {
+        newErrors.resumeFile = 'Resume is required';
       }
     });
 
@@ -72,10 +81,21 @@ const CompanyRegistration = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    if (name.startsWith('education.')) {
+      const field = name.split('.')[1];
+      setFormData(prev => ({
+        ...prev,
+        education: {
+          ...prev.education,
+          [field]: value
+        }
+      }));
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        [name]: value
+      }));
+    }
     
     if (errors[name]) {
       setErrors(prev => ({
@@ -85,17 +105,24 @@ const CompanyRegistration = () => {
     }
   };
 
-  const handleLogoUpload = (e) => {
+  const handleFileUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setFormData(prev => ({
-        ...prev,
-        logo: file
-      }));
-      if (errors.logo) {
-        setErrors(prev => ({
+      if (file.type === 'application/pdf' && file.size <= 5 * 1024 * 1024) {
+        setFormData(prev => ({
           ...prev,
-          logo: ''
+          resumeFile: file
+        }));
+        if (errors.resumeFile) {
+          setErrors(prev => ({
+            ...prev,
+            resumeFile: ''
+          }));
+        }
+      } else {
+        setErrors(prev => ({ 
+          ...prev, 
+          resumeFile: 'Please upload a PDF file under 5MB' 
         }));
       }
     }
@@ -121,14 +148,17 @@ const CompanyRegistration = () => {
     setLoading(true);
     try {
       await new Promise(resolve => setTimeout(resolve, 2000));
-      console.log('Company registered:', formData);
+      console.log('Application submitted:', formData);
       setSuccess(true);
     } catch (error) {
-      console.error('Registration failed:', error);
+      console.error('Submission failed:', error);
     } finally {
       setLoading(false);
     }
   };
+
+  const currentYear = new Date().getFullYear();
+  const years = Array.from({ length: 10 }, (_, i) => currentYear + i);
 
   const renderStepContent = () => {
     switch (currentStep) {
@@ -137,56 +167,45 @@ const CompanyRegistration = () => {
           <div className="space-y-6">
             <div className="rounded-lg p-4 mb-6" style={{ background: 'linear-gradient(135deg, #620080 0%, #5a007a 100%)' }}>
               <h3 className="text-xl font-semibold text-white flex items-center">
-                Basic Company Information
+                Personal Information
               </h3>
             </div>
             <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 <div>
                   <input
-                    name="companyName"
-                    value={formData.companyName}
+                    name="fullName"
+                    value={formData.fullName}
                     onChange={handleInputChange}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:border-transparent placeholder-gray-400"
                     style={{ '--tw-ring-color': '#620080' }}
-                    placeholder="Company Name *"
+                    placeholder="Full Name *"
                   />
-                  {errors.companyName && <p className="text-red-500 text-sm mt-1">{errors.companyName}</p>}
+                  {errors.fullName && <p className="text-red-500 text-sm mt-1">{errors.fullName}</p>}
                 </div>
                 <div>
                   <input
-                    name="companyEmail"
+                    name="email"
                     type="email"
-                    value={formData.companyEmail}
+                    value={formData.email}
                     onChange={handleInputChange}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:border-transparent placeholder-gray-400"
                     style={{ '--tw-ring-color': '#620080' }}
-                    placeholder="Company Email *"
+                    placeholder="Email Address *"
                   />
-                  {errors.companyEmail && <p className="text-red-500 text-sm mt-1">{errors.companyEmail}</p>}
+                  {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
                 </div>
-                <div>
+                <div className="lg:col-span-2">
                   <input
-                    name="companyPhone"
+                    name="phone"
                     type="tel"
-                    value={formData.companyPhone}
+                    value={formData.phone}
                     onChange={handleInputChange}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:border-transparent placeholder-gray-400"
                     style={{ '--tw-ring-color': '#620080' }}
-                    placeholder="Company Phone *"
+                    placeholder="Phone Number *"
                   />
-                  {errors.companyPhone && <p className="text-red-500 text-sm mt-1">{errors.companyPhone}</p>}
-                </div>
-                <div>
-                  <input
-                    name="website"
-                    value={formData.website}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:border-transparent placeholder-gray-400"
-                    style={{ '--tw-ring-color': '#620080' }}
-                    placeholder="Website URL *"
-                  />
-                  {errors.website && <p className="text-red-500 text-sm mt-1">{errors.website}</p>}
+                  {errors.phone && <p className="text-red-500 text-sm mt-1">{errors.phone}</p>}
                 </div>
               </div>
             </div>
@@ -198,82 +217,66 @@ const CompanyRegistration = () => {
           <div className="space-y-6">
             <div className="rounded-lg p-4 mb-6" style={{ background: 'linear-gradient(135deg, #620080 0%, #5a007a 100%)' }}>
               <h3 className="text-xl font-semibold text-white flex items-center">
-                Legal & Business Details
+                Education Details
               </h3>
             </div>
             <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                <div>
+                <div className="lg:col-span-2">
                   <input
-                    name="gst"
-                    value={formData.gst}
+                    name="education.college"
+                    value={formData.education.college}
                     onChange={handleInputChange}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:border-transparent placeholder-gray-400"
                     style={{ '--tw-ring-color': '#620080' }}
-                    placeholder="GST Number *"
+                    placeholder="College/University Name *"
                   />
-                  {errors.gst && <p className="text-red-500 text-sm mt-1">{errors.gst}</p>}
-                </div>
-                <div>
-                  <input
-                    name="cin"
-                    value={formData.cin}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:border-transparent placeholder-gray-400"
-                    style={{ '--tw-ring-color': '#620080' }}
-                    placeholder="CIN Number *"
-                  />
-                  {errors.cin && <p className="text-red-500 text-sm mt-1">{errors.cin}</p>}
+                  {errors['education.college'] && <p className="text-red-500 text-sm mt-1">{errors['education.college']}</p>}
                 </div>
                 <div>
                   <select
-                    name="companySize"
-                    value={formData.companySize}
+                    name="education.degree"
+                    value={formData.education.degree}
                     onChange={handleInputChange}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:border-transparent text-gray-700"
                     style={{ '--tw-ring-color': '#620080' }}
                   >
-                    <option value="">Select Company Size *</option>
-                    <option value="1-10">1-10 employees</option>
-                    <option value="11-50">11-50 employees</option>
-                    <option value="51-200">51-200 employees</option>
-                    <option value="201+">201+ employees</option>
+                    <option value="">Select Degree *</option>
+                    <option value="B.Tech">B.Tech</option>
+                    <option value="B.E">B.E</option>
+                    <option value="BCA">BCA</option>
+                    <option value="B.Sc">B.Sc</option>
+                    <option value="M.Tech">M.Tech</option>
+                    <option value="MCA">MCA</option>
+                    <option value="M.Sc">M.Sc</option>
                   </select>
-                  {errors.companySize && <p className="text-red-500 text-sm mt-1">{errors.companySize}</p>}
+                  {errors['education.degree'] && <p className="text-red-500 text-sm mt-1">{errors['education.degree']}</p>}
                 </div>
                 <div>
                   <input
-                    name="industry"
-                    value={formData.industry}
+                    name="education.branch"
+                    value={formData.education.branch}
                     onChange={handleInputChange}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:border-transparent placeholder-gray-400"
                     style={{ '--tw-ring-color': '#620080' }}
-                    placeholder="Industry *"
+                    placeholder="Branch/Stream *"
                   />
-                  {errors.industry && <p className="text-red-500 text-sm mt-1">{errors.industry}</p>}
+                  {errors['education.branch'] && <p className="text-red-500 text-sm mt-1">{errors['education.branch']}</p>}
                 </div>
-                <div>
-                  <input
-                    name="headquarters"
-                    value={formData.headquarters}
+                <div className="lg:col-span-2">
+                  <select
+                    name="education.yearOfPassing"
+                    value={formData.education.yearOfPassing}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:border-transparent placeholder-gray-400"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:border-transparent text-gray-700"
                     style={{ '--tw-ring-color': '#620080' }}
-                    placeholder="Headquarters *"
-                  />
-                  {errors.headquarters && <p className="text-red-500 text-sm mt-1">{errors.headquarters}</p>}
-                </div>
-                <div>
-                  <input
-                    name="foundedYear"
-                    type="number"
-                    value={formData.foundedYear}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:border-transparent placeholder-gray-400"
-                    style={{ '--tw-ring-color': '#620080' }}
-                    placeholder="Founded Year *"
-                  />
-                  {errors.foundedYear && <p className="text-red-500 text-sm mt-1">{errors.foundedYear}</p>}
+                  >
+                    <option value="">Select Year of Passing *</option>
+                    {years.map(year => (
+                      <option key={year} value={year}>{year}</option>
+                    ))}
+                  </select>
+                  {errors['education.yearOfPassing'] && <p className="text-red-500 text-sm mt-1">{errors['education.yearOfPassing']}</p>}
                 </div>
               </div>
             </div>
@@ -285,32 +288,32 @@ const CompanyRegistration = () => {
           <div className="space-y-6">
             <div className="rounded-lg p-4 mb-6" style={{ background: 'linear-gradient(135deg, #620080 0%, #5a007a 100%)' }}>
               <h3 className="text-xl font-semibold text-white flex items-center">
-                Company Logo
+                Resume Upload
               </h3>
             </div>
             <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
               <div className="border-2 border-dashed rounded-lg p-12 text-center hover:border-opacity-60 transition-colors" style={{ borderColor: '#bf80d9' }}>
                 <input
                   type="file"
-                  onChange={handleLogoUpload}
+                  onChange={handleFileUpload}
                   className="hidden"
-                  id="logo-upload"
-                  accept="image/*"
+                  id="resume-upload"
+                  accept=".pdf"
                 />
-                <label htmlFor="logo-upload" className="cursor-pointer">
+                <label htmlFor="resume-upload" className="cursor-pointer">
                   <div className="mb-4" style={{ color: '#a300d6' }}>
                     <svg className="mx-auto h-20 w-20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                     </svg>
                   </div>
                   <p className="text-xl text-gray-700 font-semibold mb-2">
-                    {formData.logo ? formData.logo.name : 'Upload Company Logo'}
+                    {formData.resumeFile ? formData.resumeFile.name : 'Upload Resume (PDF)'}
                   </p>
                   <p className="text-sm text-gray-500">Click to upload or drag and drop</p>
-                  <p className="text-xs text-gray-400 mt-1">PNG, JPG, GIF up to 10MB</p>
+                  <p className="text-xs text-gray-400 mt-1">PDF files up to 5MB</p>
                 </label>
               </div>
-              {errors.logo && <p className="text-red-500 text-sm mt-2">{errors.logo}</p>}
+              {errors.resumeFile && <p className="text-red-500 text-sm mt-2">{errors.resumeFile}</p>}
             </div>
           </div>
         );
@@ -320,81 +323,20 @@ const CompanyRegistration = () => {
           <div className="space-y-6">
             <div className="rounded-lg p-4 mb-6" style={{ background: 'linear-gradient(135deg, #620080 0%, #5a007a 100%)' }}>
               <h3 className="text-xl font-semibold text-white flex items-center">
-                Company Description
+                Cover Letter
               </h3>
             </div>
             <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
               <textarea
-                name="description"
-                value={formData.description}
+                name="coverLetter"
+                value={formData.coverLetter}
                 onChange={handleInputChange}
                 className="w-full px-4 py-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:border-transparent placeholder-gray-400"
                 style={{ '--tw-ring-color': '#620080' }}
-                placeholder="Tell us about your company... *"
+                placeholder="Tell us why you're interested in this internship and what makes you a perfect candidate... (Optional)"
                 rows="6"
               />
-              {errors.description && <p className="text-red-500 text-sm mt-1">{errors.description}</p>}
-            </div>
-          </div>
-        );
-      
-      case 5:
-        return (
-          <div className="space-y-6">
-            <div className="rounded-lg p-4 mb-6" style={{ background: 'linear-gradient(135deg, #620080 0%, #5a007a 100%)' }}>
-              <h3 className="text-xl font-semibold text-white flex items-center">
-                HR Contact & Social Links
-              </h3>
-            </div>
-            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                <div>
-                  <input
-                    name="hrContactName"
-                    value={formData.hrContactName}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:border-transparent placeholder-gray-400"
-                    style={{ '--tw-ring-color': '#620080' }}
-                    placeholder="HR Contact Name *"
-                  />
-                  {errors.hrContactName && <p className="text-red-500 text-sm mt-1">{errors.hrContactName}</p>}
-                </div>
-                <div>
-                  <input
-                    name="hrContactEmail"
-                    type="email"
-                    value={formData.hrContactEmail}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:border-transparent placeholder-gray-400"
-                    style={{ '--tw-ring-color': '#620080' }}
-                    placeholder="HR Contact Email *"
-                  />
-                  {errors.hrContactEmail && <p className="text-red-500 text-sm mt-1">{errors.hrContactEmail}</p>}
-                </div>
-                <div>
-                  <input
-                    name="hrContactPhone"
-                    type="tel"
-                    value={formData.hrContactPhone}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:border-transparent placeholder-gray-400"
-                    style={{ '--tw-ring-color': '#620080' }}
-                    placeholder="HR Contact Phone *"
-                  />
-                  {errors.hrContactPhone && <p className="text-red-500 text-sm mt-1">{errors.hrContactPhone}</p>}
-                </div>
-                <div>
-                  <input
-                    name="socialLinks"
-                    value={formData.socialLinks}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:border-transparent placeholder-gray-400"
-                    style={{ '--tw-ring-color': '#620080' }}
-                    placeholder="Social Media URL *"
-                  />
-                  {errors.socialLinks && <p className="text-red-500 text-sm mt-1">{errors.socialLinks}</p>}
-                </div>
-              </div>
+              {errors.coverLetter && <p className="text-red-500 text-sm mt-1">{errors.coverLetter}</p>}
             </div>
           </div>
         );
@@ -406,6 +348,7 @@ const CompanyRegistration = () => {
 
   return (
     <div className="min-h-screen bg-white py-8 px-4 relative overflow-hidden">
+
       {/* Success Popup Modal */}
       {success && (
         <div className="fixed inset-0 flex items-center justify-center z-50">
@@ -430,9 +373,9 @@ const CompanyRegistration = () => {
               </div>
               
               {/* Success Message */}
-              <h3 className="text-2xl font-bold text-gray-800 mb-4">Registration Successful!</h3>
+              <h3 className="text-2xl font-bold text-gray-800 mb-4">Application Submitted!</h3>
               <p className="text-gray-600 mb-6">
-                Welcome to Internship Portal! Your company has been successfully registered.
+                Your internship application has been successfully submitted. We'll get back to you soon!
               </p>
               
               {/* OK Button */}
@@ -450,14 +393,15 @@ const CompanyRegistration = () => {
 
       {/* Header */}
       <div className="text-center mb-8">
-        <h1 className="text-4xl lg:text-4xl font-bold mb-4" style={{ color: '#620080' }}>Welcome to Internship Portal</h1>
-        <p className="text-gray-600 text-lg mb-6">Register your company and start hiring</p>
+
+        <h1 className="text-4xl lg:text-4xl font-bold mb-4" style={{ color: '#620080' }}>Apply for Internship</h1>
+        <p className="text-gray-600 text-lg mb-6">Join our team and start your career journey</p>
       </div>
 
       <div className="max-w-7xl mx-auto flex gap-8">
         {/* Step Navigation Sidebar */}
         <div className="w-80 bg-white rounded-2xl shadow-2xl p-6 h-fit sticky top-8 border border-gray-100">
-          <h3 className="text-lg font-bold mb-6" style={{ color: '#620080' }}>Registration Steps</h3>
+          <h3 className="text-lg font-bold mb-6" style={{ color: '#620080' }}>Application Steps</h3>
           <div className="space-y-0">
             {steps.map((step, index) => (
               <div key={step.number} className="flex items-center">
@@ -521,7 +465,7 @@ const CompanyRegistration = () => {
             {/* Progress Bar */}
             <div className="mb-8">
               <div className="flex justify-between items-center mb-2">
-                <h2 className="text-2xl font-bold text-gray-800">Company Registration</h2>
+                <h2 className="text-2xl font-bold text-gray-800">Internship Application</h2>
                 <span className="text-sm text-gray-500">Step {currentStep} of {steps.length}</span>
               </div>
               <div className="w-full bg-gray-200 rounded-full h-2">
@@ -582,10 +526,10 @@ const CompanyRegistration = () => {
                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                       </svg>
-                      Registering...
+                      Submitting...
                     </div>
                   ) : (
-                    'Register Company'
+                    'Submit Application'
                   )}
                 </button>
               )}
@@ -597,4 +541,4 @@ const CompanyRegistration = () => {
   );
 };
 
-export default CompanyRegistration;
+export default InternshipApplicationForm;

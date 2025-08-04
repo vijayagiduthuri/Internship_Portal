@@ -8,6 +8,7 @@ import UserProfile from './pages/UserProfile'
 import UserDashboard from './pages/UserDashboard'
 import ForgotPassword from './pages/ForgotPassword'
 import UserHomePage from './pages/UserHomePage';
+import InternshipApplicationForm from './pages/ApplyInternship'
 
 
 function App() {
@@ -20,6 +21,7 @@ function App() {
       <Route path="/user-dashboard" element={<UserDashboard/>}/>
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path='/UserHomePage' element={<UserHomePage/>}/>
+      <Route path='/apply-internship' element={<InternshipApplicationForm/>}/>
     </Routes>
   )
 }
