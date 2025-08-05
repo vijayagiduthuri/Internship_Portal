@@ -9,7 +9,6 @@ import UserDashboard from './pages/UserDashboard'
 import ForgotPassword from './pages/ForgotPassword'
 import UserHomePage from './pages/UserHomePage';
 import InternshipApplicationForm from './pages/ApplyInternship'
-import AdminPanel from './pages/AdminPanel/AdminPanel'
 
 
 function App() {
@@ -23,7 +22,6 @@ function App() {
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path='/UserHomePage' element={<UserHomePage/>}/>
       <Route path='/apply-internship' element={<InternshipApplicationForm/>}/>
-      <Route path='/admin/*' element={<AdminPanel/>}/>
     </Routes>
   )
 }

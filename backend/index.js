@@ -20,8 +20,7 @@ const app = express();
 // CORS configuration
 app.use(
   cors({
-    origin: ["http://localhost:5173", // Replace with your frontend URL
-    "https://eae5ed0a9e4b.ngrok-free.app"],
+    origin: "http://localhost:5173", // Replace with your frontend URL
     credentials: true, // Allow credentials (cookies, authorization headers, etc.)
   })
 );

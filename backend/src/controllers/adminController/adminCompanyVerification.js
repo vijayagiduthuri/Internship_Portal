@@ -137,16 +137,3 @@ export const verifyCompany = async (req, res) => {
     });
   }
 };
-
-export const getPendingCompanies = async (req, res) => {
-  try {
-    const pendingCompanies = await Company.find({ verified: false })
-      .select('name email industry description website hrContact headquarters createdAt')
-      .sort({ createdAt: -1 });
-
-    res.status(200).json(pendingCompanies);
-  } catch (error) {
-    console.error("Error fetching pending companies:", error);
-    res.status(500).json({ error: "Internal Server Error" });
-  }
-};
