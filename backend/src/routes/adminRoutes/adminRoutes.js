@@ -5,6 +5,7 @@ import { getDashboardStats, getMonthlyApplicationStats } from "../../controllers
 const router = express.Router();
 
 router.post("/verify-company/:companyId/:verify", verifyCompany);
+router.get("/pending-companies", getPendingCompanies);
 
 router.get("/admin-stats", getDashboardStats);
 
