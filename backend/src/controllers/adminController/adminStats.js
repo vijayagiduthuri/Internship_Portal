@@ -27,6 +27,7 @@ export const getDashboardStats = async (req, res) => {
 };
 
 // Function to get Monthly applications
+// added line
 export const getMonthlyApplicationStats = async (req, res) => {
   try {
     const stats = await Application.aggregate([
